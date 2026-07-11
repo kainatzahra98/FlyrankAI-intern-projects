@@ -58,7 +58,8 @@ That's it. One file. Two lines. Service, routes, and app.js: **zero changes.**
 
 ## Prerequisites
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) — install and open it first
+- [Node.js](https://nodejs.org/en/) installed.
+- (Note: We are using a Cloud Postgres Database via Neon instead of Docker Desktop due to disk space constraints, fulfilling the requirement for real DB persistence and repository pattern.)
 
 ---
 
@@ -78,10 +79,9 @@ week-2-assignment/
 │   │   └── postgresRepository.js  ← Real DB (same interface)
 │   └── db/
 │       ├── index.js               ← pg connection pool
-│       └── init.sql               ← CREATE TABLE — auto-run on first start
-├── docker-compose.yml             ← Start everything with one command
-├── Dockerfile                     ← Builds the Node.js app image
-├── .env                           ← Gitignored — your real secrets
+│       └── init.sql               ← CREATE TABLE schema
+│       └── run_init.js            ← Script to initialize DB on Neon
+├── .env                           ← Gitignored — your real secrets (Neon connection)
 ├── .env.example                   ← Committed — template for teammates
 ├── package.json
 ├── .gitignore
@@ -92,32 +92,21 @@ week-2-assignment/
 
 ## How to run
 
-### One command — starts everything (Postgres + App)
+### One command — starts the app
 
 ```bash
 cd week-2-assignment
-docker compose up --build
+npm install
+npm start
 ```
 
-Docker will:
-1. Pull `postgres:16-alpine` image
-2. Create the `week2db` database
-3. Run `init.sql` → creates the `items` table automatically
-4. Build your Node.js app image
-5. Start both services; app waits for Postgres healthcheck before connecting
+The app connects to the Neon Cloud Postgres DB using the URL in `.env`.
 
 You should see:
 ```
-week2_postgres  | database system is ready to accept connections
-week2_app       | [db] Connected to Postgres
-week2_app       | [server] Running on http://localhost:4000
-week2_app       | [server] Storage: PostgresRepository
-```
-
-### Stop everything
-```bash
-docker compose down        # stops containers (data persists in volume)
-docker compose down -v     # stops + deletes volume (wipes all data)
+[db] Connected to Postgres
+[server] Running on http://localhost:4000
+[server] Storage: PostgresRepository
 ```
 
 ---
@@ -176,8 +165,8 @@ curl -X DELETE http://localhost:4000/items/1
 This is how persistence was verified:
 
 ```bash
-# Step 1 — Start the stack
-docker compose up --build
+# Step 1 — Start the app
+npm start
 
 # Step 2 — Create rows
 curl -X POST http://localhost:4000/items \
@@ -188,33 +177,17 @@ curl -X POST http://localhost:4000/items \
 curl http://localhost:4000/items
 # → rows visible ✅
 
-# Step 4 — Stop everything (app + container)
-docker compose down
+# Step 4 — Stop the server (Ctrl+C)
 
-# Step 5 — Start again (no --build needed)
-docker compose up
+# Step 5 — Start again
+npm start
 
 # Step 6 — Check data is still there
 curl http://localhost:4000/items
-# → same rows still there ✅  (data survived because of the Docker volume)
+# → same rows still there ✅  (data survived because it is saved in the Neon cloud DB)
 ```
 
-**Why it works:** The `pgdata` volume in `docker-compose.yml` maps Postgres's data directory to a named Docker volume on your machine. `docker compose down` stops containers but does NOT delete named volumes — so data survives.
-
----
-
-## Connecting directly to Postgres (optional)
-
-While the stack is running:
-```bash
-# Connect with psql from inside the container
-docker exec -it week2_postgres psql -U postgres -d week2db
-
-# Then run SQL directly:
-SELECT * FROM items;
-EXPLAIN ANALYZE SELECT * FROM items WHERE id = 1;
-\q
-```
+**Why it works:** Data is being sent to the real Postgres database running in the cloud (Neon.tech). When the Node.js app stops, the database keeps running independently, persisting all data.
 
 ---
 

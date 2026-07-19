@@ -1,0 +1,13 @@
+{
+  "name": "week5-background-jobs",
+  "version": "1.0.0",
+  "description": "Background job pipeline for slow AI operations",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0"
+  }
+}

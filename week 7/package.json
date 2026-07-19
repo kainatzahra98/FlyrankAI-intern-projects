@@ -1,0 +1,15 @@
+{
+  "name": "week7-pdf-reports",
+  "version": "1.0.0",
+  "description": "Background PDF report generation pipeline",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "pdfkit": "^0.13.0",
+    "uuid": "^9.0.0"
+  }
+}

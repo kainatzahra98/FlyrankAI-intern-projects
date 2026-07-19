@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+.DS_Store
+# If you want to commit the data for the RAG corpus, you can remove data/ from here.
+# But it's usually best practice not to commit large datasets to git.
+data/

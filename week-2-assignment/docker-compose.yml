@@ -1,0 +1,40 @@
+services:
+
+  # ── Postgres Database ──────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: week2_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: week2db
+    ports:
+      - "5432:5432"          # expose so you can connect with psql or pgAdmin
+    volumes:
+      - pgdata:/var/lib/postgresql/data                        # persist data across restarts
+      - ./src/db/init.sql:/docker-entrypoint-initdb.d/init.sql # auto-run on first start
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d week2db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Node.js App ────────────────────────────────────────────────────────────
+  app:
+    build: .
+    container_name: week2_app
+    restart: unless-stopped
+    env_file: .env                 # reads DATABASE_URL and PORT
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy  # wait until Postgres is ready before starting
+    environment:
+      # Override host to use Docker service name (not localhost)
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/week2db
+
+volumes:
+  pgdata:
+    driver: local

@@ -1,64 +1,80 @@
 'use strict';
 
+/**
+ * server.js — Entry Point (Week 4 — Auth Login & Protect)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Stages wired here:
+ *   Stage 0 — Supabase client + server startup
+ *   Stage 1 — /auth routes (signup, login, logout)
+ *   Stage 2 — /public and /protected routes
+ *   Stage 3 — token verification inside requireAuth middleware
+ *   Stage 4 — middleware applied at router level (protected.js)
+ *   Stage 5 — Swagger UI at /docs
+ */
+
 require('dotenv').config();
-const express = require('express');
-const rateLimit = require('express-rate-limit');
 
-const authRoutes = require('./routes/auth');
+const express      = require('express');
+const swaggerUi    = require('swagger-ui-express');
+const openApiSpec  = require('../openapi.json');
+
+// Import route modules
+const authRoutes      = require('./routes/auth');
+const publicRoutes    = require('./routes/public');
 const protectedRoutes = require('./routes/protected');
-const { initDb } = require('./db/database');
-const { errorHandler } = require('./middleware/errorHandler');
 
-const app = express();
+// Trigger Supabase client init (exits if env vars missing)
+require('./supabaseClient');
+
+const app  = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Middleware ────────────────────────────────────────────────────────────────
-
+// ── Global Middleware ─────────────────────────────────────────────────────────
 app.use(express.json());
 
-// Rate limiter: max 20 requests per minute per IP (prevents brute-force)
-const limiter = rateLimit({
-  windowMs: 60 * 1000,
-  max: 20,
-  standardHeaders: true,
-  legacyHeaders: false,
-  message: { error: 'Too many requests – slow down.' },
-});
-app.use(limiter);
+// ── Stage 5: Swagger UI at /docs ──────────────────────────────────────────────
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(openApiSpec, {
+  swaggerOptions: {
+    // Pre-fill the Authorize dialog with Bearer scheme
+    persistAuthorization: true,
+  },
+  customSiteTitle: 'W4 Auth API — Supabase',
+}));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
+app.use('/auth',      authRoutes);
+app.use('/public',    publicRoutes);
+app.use('/protected', protectedRoutes);
 
-// Public auth routes
-app.use('/auth', authRoutes);
-
-// Protected routes (JWT required)
-app.use('/api', protectedRoutes);
-
-// Health check (public, no auth)
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// 404 catch-all
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Route not found.' });
-});
-
-// Central error handler
-app.use(errorHandler);
-
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
-
-(async () => {
-  await initDb();
-  app.listen(PORT, () => {
-    console.log(`\n🚀  Week 4 Auth Server running on http://localhost:${PORT}`);
-    console.log('────────────────────────────────────────');
-    console.log('  POST /auth/register  – create an account');
-    console.log('  POST /auth/login     – get a JWT token');
-    console.log('  GET  /api/me         – protected: who am I?');
-    console.log('  GET  /api/secret     – protected: secret data');
-    console.log('  GET  /health         – public: health check');
-    console.log('────────────────────────────────────────\n');
+// ── Root health check ─────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    message:  '🔐  W4 Auth API — Supabase + JWT',
+    docs:     `http://localhost:${PORT}/docs`,
+    endpoints: {
+      open:      ['GET /public/info'],
+      auth:      ['POST /auth/signup', 'POST /auth/login', 'POST /auth/logout'],
+      protected: ['GET /protected/profile', 'GET /protected/dashboard'],
+    },
   });
-})();
+});
+
+// ── Global Error Handler ──────────────────────────────────────────────────────
+app.use((err, req, res, _next) => {
+  console.error('[ERROR]', err.message);
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+});
+
+// ── Start ─────────────────────────────────────────────────────────────────────
+app.listen(PORT, () => {
+  console.log(`\n🚀  Server running and connected to Supabase`);
+  console.log(`    Local:  http://localhost:${PORT}`);
+  console.log(`    Docs:   http://localhost:${PORT}/docs\n`);
+  console.log('  Endpoints:');
+  console.log('    GET    /public/info         (no auth)');
+  console.log('    POST   /auth/signup         (register)');
+  console.log('    POST   /auth/login          (get JWT)');
+  console.log('    POST   /auth/logout         (🔒 protected)');
+  console.log('    GET    /protected/profile   (🔒 protected)');
+  console.log('    GET    /protected/dashboard (🔒 protected)\n');
+});

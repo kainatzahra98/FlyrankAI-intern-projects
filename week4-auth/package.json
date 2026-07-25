@@ -1,21 +1,20 @@
 {
   "name": "week4-auth",
   "version": "1.0.0",
-  "description": "Week 4 Assignment - Auth: Login & Protect (Backend AI Engineering)",
+  "description": "Week 4 Assignment — Auth Login & Protect with Supabase, Express, and Swagger UI",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "dev": "node --watch src/server.js",
     "test": "node tests/auth.test.js"
   },
+  "keywords": ["supabase", "auth", "jwt", "express", "swagger"],
+  "author": "Flyrankai",
+  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.2",
+    "@supabase/supabase-js": "^2.45.4",
     "dotenv": "^16.4.5",
-    "express-rate-limit": "^7.3.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+    "express": "^4.19.2",
+    "swagger-ui-express": "^5.0.1"
   }
 }

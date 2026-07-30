@@ -12,37 +12,41 @@ const widgetStore = require('../repositories/widgetStore');
 
 // Dynamic CORS Middleware for widget-specific endpoints
 async function handleWidgetCors(req, res, next) {
-  const origin = req.headers['origin'] || '*';
-  const widgetId = req.params.id || req.body?.widget_id;
+  try {
+    const origin = req.headers['origin'] || '*';
+    const widgetId = req.params.id || req.body?.widget_id;
 
-  let allowedOrigins = ['*'];
-  if (widgetId) {
-    const widget = await widgetStore.getWidgetById(widgetId);
-    if (widget && widget.allowed_origins) {
-      allowedOrigins = widget.allowed_origins;
+    let allowedOrigins = ['*'];
+    if (widgetId) {
+      const widget = await widgetStore.getWidgetById(widgetId);
+      if (widget && widget.allowed_origins) {
+        allowedOrigins = widget.allowed_origins;
+      }
     }
-  }
 
-  const isAllowed = allowedOrigins.includes('*') || allowedOrigins.includes(origin);
+    const isAllowed = allowedOrigins.includes('*') || allowedOrigins.includes(origin);
 
-  if (isAllowed) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  } else {
-    // If origin is forbidden by widget owner configuration
+    if (isAllowed) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+    } else {
+      // If origin is forbidden by widget owner configuration
+      if (req.method === 'OPTIONS') {
+        return res.status(403).json({ error: `Origin ${origin} is not allowed by this widget configuration.` });
+      }
+    }
+
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours preflight cache
+
     if (req.method === 'OPTIONS') {
-      return res.status(403).json({ error: `Origin ${origin} is not allowed by this widget configuration.` });
+      return res.status(204).end();
     }
+
+    next();
+  } catch (err) {
+    next(err);
   }
-
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.setHeader('Access-Control-Max-Age', '86400'); // 24 hours preflight cache
-
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-
-  next();
 }
 
 // Submission Rate Limiter Middleware

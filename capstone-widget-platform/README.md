@@ -2,7 +2,7 @@
 
 > **The "Public Internet is Your Input" Capstone**
 > 
-> A production-grade multi-tenant platform that lets customers define customizable web widgets (popovers, signup forms, CTAs), embed them on any external website via a one-line `<script>` tag, and capture cross-origin submissions back to a hardened backend with **dynamic CORS validation**, **input boundary enforcement**, **abuse controls (honeypot + 429 rate limiter)**, a **3-provider IP→Geo enrichment fallback chain**, and **safe isolated side-effects**.
+> A production-grade multi-tenant platform that lets customers define customizable web widgets (7 layout modes: Exit-Intent Popover, Inline Form, Floating CTA, Top Banner, Bottom Slide-in, Chat Bubble, Fullscreen Modal), embed them on any external website via a one-line `<script>` tag, and capture cross-origin submissions back to a hardened backend with **dynamic CORS validation**, **input boundary enforcement**, **abuse controls (honeypot + 429 rate limiter)**, a **3-provider IP→Geo enrichment fallback chain**, and **safe isolated side-effects**.
 
 ---
 
@@ -27,7 +27,7 @@
 │  External Customer Website (2nd Origin / Host Site)                                    │
 │                                                                                        │
 │  <script src="http://localhost:4000/cdn/widget.js" data-widget-id="..." async></script>│
-│  └─► Auto-renders Popup / Form Overlay with Theme & Honeypot Trap                      │
+│  └─► Auto-renders Popup / Banner / Form Overlay with Theme & Honeypot Trap             │
 └────────────────────────────────────────────┬───────────────────────────────────────────┘
                                              │
                                              │ CORS POST /api/submissions
@@ -97,32 +97,47 @@ sequenceDiagram
    - Tenant isolation enforced on all queries (`WHERE tenant_id = ...`).
    - Automatic embed snippet generator: `<script src="http://localhost:4000/cdn/widget.js" data-widget-id="WIDGET_ID" async></script>`.
 
-2. **Cached CDN Config Delivery**:
+2. **Visual No-Code Builder & Customizer Studio**:
+   - Live visual builder at `/demo/widget-builder.html` allowing customers to customize widget types, copy, colors, fields, and security targeting with real-time preview and 1-click script snippet generation.
+
+3. **7 Widget Layout Modes**:
+   - Exit-Intent Popover Card
+   - Inline Embedded Form Card
+   - Floating Call-To-Action Button
+   - Full-Width Top Sticky Announcement Bar
+   - Bottom-Left Slide-In Drawer Box
+   - Floating Chat Lead Bubble Badge
+   - Full-Screen Overlay Backdrop Takeover
+
+4. **Cached CDN Config Delivery**:
    - `GET /api/widgets/:id/config` serves minimal JSON with CDN headers (`Cache-Control: public, max-age=60, s-maxage=300`).
    - Cross-Origin script execution auto-detects `data-widget-id` and renders the overlay DOM.
 
-3. **Public Submission Boundary & CORS**:
+5. **Public Submission Boundary & CORS**:
    - Preflight `OPTIONS /api/submissions` support.
    - Origin validation against widget `allowed_origins`.
    - Input boundary validation enforcing required fields and payload size limits (< 50KB).
 
-4. **Abuse Resistance (Rate-Limiter & Bot Spam Defense)**:
+6. **Abuse Resistance (Rate-Limiter & Bot Spam Defense)**:
    - Rate limiter capping submissions at 5 requests per minute per IP/widget (returns `429 Too Many Requests`).
    - Honeypot bot trap field (`_hp_trap`). If filled by automated scrapers/bots, it is caught and flagged as `is_spam: true`.
 
-5. **IP→Geo Enrichment Fallback Chain**:
+7. **IP→Geo Enrichment Fallback Chain**:
    - **Provider 1 (Primary)**: MaxMind / Primary Geo API.
    - **Provider 2 (Secondary)**: IpApi / Backup Geo API.
    - **Provider 3 (Fallback)**: Local Default Resolver.
    - Degrades gracefully — if Provider 1 fails or is toggled down, Provider 2 takes over seamlessly!
 
-6. **Safe Side Effects Isolation**:
+8. **Safe Side Effects Isolation**:
    - Webhook & email notifications execute in isolated asynchronous blocks (`setImmediate`).
    - If the downstream webhook server crashes (500) or times out, the submission **still succeeds** (`201 Created`).
 
-7. **Owner Dashboard & Analytics**:
+9. **Owner Dashboard & Analytics**:
    - `GET /api/submissions`: List captured submissions for owner widgets.
    - `GET /api/widgets/:id/stats`: Total submissions, clean vs spam breakdown, spam rate, and country distribution.
+
+10. **Production Deployment Suite**:
+    - Dockerfile, `.dockerignore`, `.env.example`, and comprehensive `DEPLOYMENT.md` guide for Render, Cloud Run, Railway, and AWS.
 
 ---
 
@@ -146,20 +161,14 @@ Output:
 🚀 Capstone Widget Platform running on http://localhost:4000
    📦 CDN Script:           http://localhost:4000/cdn/widget.js
    🌐 Customer Site Demo:   http://localhost:4000/demo/customer-site.html
+   🎨 Widget Builder:       http://localhost:4000/demo/widget-builder.html
    📊 Admin API Base:       http://localhost:4000/api/widgets
 ```
 
-### 3. Open Demo Page
+### 3. Interactive Web Demos
 
-Open **`http://localhost:4000/demo/customer-site.html`** in your browser.
-This page simulates a second, external customer website loading your widget script cross-origin!
-
-Interactive demo buttons let you test:
-- 1. Valid Submission & Geo Enrichment
-- 2. Triggering the `429` Rate Limiter (6 rapid requests)
-- 3. Honeypot Bot Attack
-- 4. Toggling Geo Provider 1 Down (Verifying Provider 2 Takeover)
-- 5. Side-Effect Webhook Failure Simulation
+- **Customer Site Demo**: Open `http://localhost:4000/demo/customer-site.html` (features editable snippet area & attack test panel).
+- **No-Code Customizer Studio**: Open `http://localhost:4000/demo/widget-builder.html` to visually build and customize widgets.
 
 ---
 
@@ -212,7 +221,7 @@ Expected output:
   ✅ PASS  GET /api/widgets/:id/stats returns 200
 
 ════════════════════════════════════════════════════════════
-  Results: 24/24 passed
+  Results: 29/29 passed
   🎉 All Capstone Tests Passed!
 ════════════════════════════════════════════════════════════
 ```
@@ -241,17 +250,20 @@ Expected output:
 
 ```
 capstone-widget-platform/
-├── package.json                   # Dependencies & scripts
+├── package.json                   # Dependencies & test script
+├── Dockerfile                     # Multi-stage Alpine production build
+├── .dockerignore                  # Docker exclusion rules
 ├── .env.example                   # Environment configuration template
-├── .gitignore                     # Git exclusion rules
-├── README.md                      # Complete documentation & architecture
+├── DEPLOYMENT.md                  # Complete deployment guide (Render/Docker/Cloud Run)
+├── README.md                      # Architecture documentation & API reference
 ├── demo/
-│   └── customer-site.html         # External customer site demo (2nd origin simulation)
+│   ├── customer-site.html         # External customer site demo (editable snippet area)
+│   └── widget-builder.html        # Visual No-Code Customizer Studio
 ├── src/
 │   ├── server.js                  # Express server & CDN route mounts
 │   ├── public/
 │   │   └── cdn/
-│   │       └── widget.js          # Cross-origin JS widget loader
+│   │       └── widget.js          # Cross-origin JS widget loader (7 layout modes)
 │   ├── middleware/
 │   │   ├── authMiddleware.js      # Admin JWT authentication
 │   │   └── corsAndAbuseMiddleware.js # Dynamic CORS & Rate limiter
@@ -264,5 +276,5 @@ capstone-widget-platform/
 │   └── repositories/
 │       └── widgetStore.js         # In-memory data & stats repository
 └── tests/
-    └── capstone.test.js           # Automated test suite
+    └── capstone.test.js           # Automated test suite (29 tests)
 ```

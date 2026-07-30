@@ -68,8 +68,9 @@ router.get('/widgets', async (req, res, next) => {
 router.post('/widgets', async (req, res, next) => {
   try {
     const widget = await widgetStore.createWidget(req.user.id, req.body);
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers.host || 'localhost:4000';
-    const embedSnippet = `<script src="http://${host}/cdn/widget.js" data-widget-id="${widget.id}" async></script>`;
+    const embedSnippet = `<script src="${proto}://${host}/cdn/widget.js" data-widget-id="${widget.id}" async></script>`;
 
     return res.status(201).json({
       message: 'Widget created successfully',
@@ -88,8 +89,9 @@ router.get('/widgets/:id', async (req, res, next) => {
     if (!widget || widget.tenant_id !== req.user.id) {
       return res.status(404).json({ error: 'Widget not found or unauthorized.' });
     }
+    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'http';
     const host = req.headers.host || 'localhost:4000';
-    const embedSnippet = `<script src="http://${host}/cdn/widget.js" data-widget-id="${widget.id}" async></script>`;
+    const embedSnippet = `<script src="${proto}://${host}/cdn/widget.js" data-widget-id="${widget.id}" async></script>`;
     return res.json({ widget, embed_snippet: embedSnippet });
   } catch (err) {
     next(err);

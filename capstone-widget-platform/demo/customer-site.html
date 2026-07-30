@@ -87,8 +87,9 @@
 
       <textarea id="snippet-input" rows="2" style="width: 100%; font-family: monospace; font-size: 13px; padding: 10px; border-radius: 6px; border: 1px solid #C7D2FE; background: #EEF2FF; color: #312E81; box-sizing: border-box; outline: none;"><script src="http://localhost:4000/cdn/widget.js" data-widget-id="wgt_demo_newsletter" async></script></textarea>
       
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
         <button onclick="applyEditedSnippet()" style="background: #059669;">⚡ Apply & Inject Custom Snippet</button>
+        <button onclick="addAnotherSnippet()" style="background: #4F46E5;">➕ Add Another Widget Snippet</button>
         <button onclick="copyEditedSnippet()" class="secondary">📋 Copy Snippet</button>
       </div>
 
@@ -170,6 +171,20 @@
       navigator.clipboard.writeText(code).then(() => {
         log('📋 Snippet code copied to clipboard!');
       });
+    }
+
+    function addAnotherSnippet() {
+      const snippetText = document.getElementById('snippet-input').value;
+      const match = snippetText.match(/data-widget-id=["']([^"']+)["']/);
+      const widgetId = match ? match[1] : 'wgt_demo_cta';
+
+      const script = document.createElement('script');
+      script.src = 'http://localhost:4000/cdn/widget.js';
+      script.setAttribute('data-widget-id', widgetId);
+      script.async = true;
+      document.body.appendChild(script);
+
+      log(`➕ Multi-Widget Embedding: Injected additional widget script for widget_id: "${widgetId}"! Multiple widgets are now running simultaneously on this page.`);
     }
 
     // 1. Valid Submission

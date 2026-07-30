@@ -1,38 +1,45 @@
 (function () {
   'use strict';
 
-  // Find script tag and extract widget ID
-  var currentScript = document.currentScript || (function () {
-    var scripts = document.getElementsByTagName('script');
-    return scripts[scripts.length - 1];
-  })();
-
-  var widgetId = currentScript ? currentScript.getAttribute('data-widget-id') : null;
-  if (!widgetId) {
-    console.error('[FlyRank Widget] Missing data-widget-id attribute on script tag.');
-    return;
+  // Find all script tags with data-widget-id that haven't been initialized
+  var scripts = document.querySelectorAll('script[data-widget-id]:not([data-fr-initialized="true"])');
+  
+  if (scripts.length === 0) {
+    // Fallback to currentScript
+    var currentScript = document.currentScript;
+    if (currentScript && currentScript.getAttribute('data-widget-id') && !currentScript.getAttribute('data-fr-initialized')) {
+      scripts = [currentScript];
+    }
   }
 
-  // Derive API host from script source
-  var scriptUrl = new URL(currentScript.src);
-  var apiBase = scriptUrl.origin;
+  scripts.forEach(function (scriptEl) {
+    var widgetId = scriptEl.getAttribute('data-widget-id');
+    if (!widgetId) return;
 
-  var renderTime = Date.now();
+    // Mark script element as initialized so it isn't rendered twice
+    scriptEl.setAttribute('data-fr-initialized', 'true');
 
-  // Fetch Config
-  fetch(apiBase + '/api/widgets/' + widgetId + '/config')
-    .then(function (res) {
-      if (!res.ok) throw new Error('Widget config fetch failed: ' + res.status);
-      return res.json();
-    })
-    .then(function (config) {
-      renderWidget(config);
-    })
-    .catch(function (err) {
-      console.warn('[FlyRank Widget] Unable to load widget:', err.message);
-    });
+    // Derive API host from script source
+    var scriptUrl = new URL(scriptEl.src, window.location.href);
+    var apiBase = scriptUrl.origin;
 
-  function renderWidget(config) {
+    var renderTime = Date.now();
+
+    // Fetch Config for this specific widget
+    fetch(apiBase + '/api/widgets/' + widgetId + '/config')
+      .then(function (res) {
+        if (!res.ok) throw new Error('Widget config fetch failed: ' + res.status);
+        return res.json();
+      })
+      .then(function (config) {
+        renderWidget(config, apiBase, renderTime);
+      })
+      .catch(function (err) {
+        console.warn('[FlyRank Widget] Unable to load widget (' + widgetId + '):', err.message);
+      });
+  });
+
+  function renderWidget(config, apiBase, renderTime) {
     var theme = config.theme || {};
     var primaryColor = theme.primary_color || '#4F46E5';
     var bgColor = theme.background_color || '#FFFFFF';
@@ -46,7 +53,7 @@
     var layoutStyles = '';
     if (layoutType === 'top_banner') {
       layoutStyles = `
-        .fr-widget-overlay {
+        .fr-widget-overlay-${config.id} {
           position: fixed;
           top: 0; left: 0; right: 0;
           width: 100%;
@@ -58,11 +65,10 @@
           align-items: center;
           justify-content: space-between;
         }
-        .fr-widget-form { flex-direction: row !important; align-items: center; gap: 10px !important; }
       `;
     } else if (layoutType === 'bottom_slidein') {
       layoutStyles = `
-        .fr-widget-overlay {
+        .fr-widget-overlay-${config.id} {
           position: fixed;
           bottom: 20px; left: 20px;
           width: 350px; max-width: 90vw;
@@ -72,14 +78,14 @@
       `;
     } else if (layoutType === 'fullscreen_modal') {
       layoutStyles = `
-        .fr-widget-backdrop {
+        .fr-widget-backdrop-${config.id} {
           position: fixed; top: 0; left: 0; right: 0; bottom: 0;
           background: rgba(17, 24, 39, 0.75);
           backdrop-filter: blur(4px);
           display: flex; align-items: center; justify-content: center;
           z-index: 999999;
         }
-        .fr-widget-overlay {
+        .fr-widget-overlay-${config.id} {
           width: 460px; max-width: 90vw;
           border-radius: ${borderRadius};
           z-index: 1000000;
@@ -87,7 +93,7 @@
       `;
     } else if (layoutType === 'floating_bubble') {
       layoutStyles = `
-        .fr-bubble-btn {
+        .fr-bubble-btn-${config.id} {
           position: fixed; bottom: 24px; right: 24px;
           width: 60px; height: 60px; border-radius: 50%;
           background: ${primaryColor}; color: white;
@@ -95,7 +101,7 @@
           font-size: 24px; cursor: pointer; z-index: 999999;
           display: flex; align-items: center; justify-content: center;
         }
-        .fr-widget-overlay {
+        .fr-widget-overlay-${config.id} {
           position: fixed; bottom: 96px; right: 24px;
           width: 350px; max-width: 90vw;
           border-radius: ${borderRadius};
@@ -103,9 +109,8 @@
         }
       `;
     } else {
-      // Default popover / cta / signup_form
       layoutStyles = `
-        .fr-widget-overlay {
+        .fr-widget-overlay-${config.id} {
           position: fixed; bottom: 24px; right: 24px;
           width: 360px; max-width: 90vw;
           border-radius: ${borderRadius};
@@ -116,7 +121,7 @@
 
     styleEl.innerHTML = `
       ${layoutStyles}
-      .fr-widget-overlay {
+      .fr-widget-overlay-${config.id} {
         background: ${bgColor};
         color: ${textColor};
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
@@ -125,36 +130,36 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         box-sizing: border-box;
       }
-      .fr-widget-header {
+      .fr-widget-header-${config.id} {
         display: flex; justify-content: space-between; align-items: flex-start;
         margin-bottom: 10px;
       }
-      .fr-widget-title {
+      .fr-widget-title-${config.id} {
         font-size: 17px; font-weight: 700; margin: 0; color: ${textColor}; line-height: 1.3;
       }
-      .fr-widget-close {
+      .fr-widget-close-${config.id} {
         background: none; border: none; font-size: 20px; cursor: pointer; color: #9CA3AF; padding: 0 4px;
       }
-      .fr-widget-close:hover { color: #4B5563; }
-      .fr-widget-copy {
+      .fr-widget-close-${config.id}:hover { color: #4B5563; }
+      .fr-widget-copy-${config.id} {
         font-size: 13px; color: #4B5563; margin-bottom: 14px; line-height: 1.4;
       }
-      .fr-widget-form {
+      .fr-widget-form-${config.id} {
         display: flex; flex-direction: column; gap: 10px;
       }
-      .fr-widget-input {
+      .fr-widget-input-${config.id} {
         width: 100%; padding: 9px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 13px; box-sizing: border-box; outline: none;
       }
-      .fr-widget-input:focus {
+      .fr-widget-input-${config.id}:focus {
         border-color: ${primaryColor}; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
       }
       .fr-widget-hp { display: none !important; position: absolute; left: -9999px; }
-      .fr-widget-btn {
+      .fr-widget-btn-${config.id} {
         background: ${primaryColor}; color: #FFFFFF; border: none; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
       }
-      .fr-widget-btn:hover { opacity: 0.9; }
-      .fr-widget-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-      .fr-widget-success {
+      .fr-widget-btn-${config.id}:hover { opacity: 0.9; }
+      .fr-widget-btn-${config.id}:disabled { opacity: 0.6; cursor: not-allowed; }
+      .fr-widget-success-${config.id} {
         background: #DEF7EC; color: #03543F; padding: 10px; border-radius: 6px; font-size: 13px; text-align: center; font-weight: 500;
       }
       .fr-widget-badge {
@@ -165,7 +170,7 @@
 
     // Build DOM container
     var container = document.createElement('div');
-    container.className = 'fr-widget-overlay';
+    container.className = 'fr-widget-overlay fr-widget-overlay-' + config.id;
     container.id = 'fr-widget-' + config.id;
 
     // Fields HTML
@@ -178,7 +183,7 @@
             name="${field.name}" 
             placeholder="${field.label || field.name}" 
             ${field.required ? 'required' : ''} 
-            class="fr-widget-input"
+            class="fr-widget-input-${config.id}"
           />
         </div>
       `;
@@ -187,15 +192,15 @@
     var honeypotHtml = `<input type="text" name="_hp_trap" value="" class="fr-widget-hp" tabindex="-1" autocomplete="off" />`;
 
     container.innerHTML = `
-      <div class="fr-widget-header">
-        <h3 class="fr-widget-title">${escapeHtml(config.headline)}</h3>
-        <button class="fr-widget-close" onclick="closeWidget('${config.id}', '${layoutType}')">&times;</button>
+      <div class="fr-widget-header-${config.id}">
+        <h3 class="fr-widget-title-${config.id}">${escapeHtml(config.headline)}</h3>
+        <button class="fr-widget-close-${config.id}" onclick="closeWidget('${config.id}', '${layoutType}')">&times;</button>
       </div>
-      <p class="fr-widget-copy">${escapeHtml(config.copy)}</p>
-      <form class="fr-widget-form" id="fr-form-${config.id}">
+      <p class="fr-widget-copy-${config.id}">${escapeHtml(config.copy)}</p>
+      <form class="fr-widget-form-${config.id}" id="fr-form-${config.id}">
         ${fieldsHtml}
         ${honeypotHtml}
-        <button type="submit" class="fr-widget-btn" id="fr-btn-${config.id}">${escapeHtml(config.cta_text || 'Submit')}</button>
+        <button type="submit" class="fr-widget-btn-${config.id}" id="fr-btn-${config.id}">${escapeHtml(config.cta_text || 'Submit')}</button>
       </form>
       <div class="fr-widget-badge">Powered by FlyRank Engine</div>
     `;
@@ -203,13 +208,13 @@
     // Handle Fullscreen Backdrop or Bubble Wrapper
     if (layoutType === 'fullscreen_modal') {
       var backdrop = document.createElement('div');
-      backdrop.className = 'fr-widget-backdrop';
+      backdrop.className = 'fr-widget-backdrop fr-widget-backdrop-' + config.id;
       backdrop.id = 'fr-backdrop-' + config.id;
       backdrop.appendChild(container);
       document.body.appendChild(backdrop);
     } else if (layoutType === 'floating_bubble') {
       var bubbleBtn = document.createElement('button');
-      bubbleBtn.className = 'fr-bubble-btn';
+      bubbleBtn.className = 'fr-bubble-btn fr-bubble-btn-' + config.id;
       bubbleBtn.id = 'fr-bubble-' + config.id;
       bubbleBtn.innerHTML = '💬';
       bubbleBtn.onclick = function() {
@@ -269,7 +274,7 @@
       })
       .then(function (data) {
         form.innerHTML = `
-          <div class="fr-widget-success">
+          <div class="fr-widget-success-${config.id}">
             🎉 Thank you! Your response has been captured.
           </div>
         `;

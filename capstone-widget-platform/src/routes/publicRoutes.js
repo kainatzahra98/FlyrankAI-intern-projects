@@ -6,7 +6,8 @@
  * Serves:
  *   - GET  /api/widgets/:id/config (Cached CDN-style config)
  *   - POST /api/submissions (CORS + Validation + Rate Limit + Spam + Geo Fallback + Safe Side Effects)
- *   - POST /api/test/toggle-geo (Test helper for provider fallback test)
+ *   - POST /api/test/toggle-geo-provider (Test helper for provider fallback test)
+ *   - POST /api/test/reset-ratelimit (Test helper to reset rate limiters for UI demo)
  */
 
 const { Router } = require('express');
@@ -17,13 +18,12 @@ const { handleWidgetCors, rateLimitSubmissions } = require('../middleware/corsAn
 
 const router = Router();
 
-// Handle CORS preflight globally for public routes
-router.options('/widgets/:id/config', handleWidgetCors);
-router.options('/submissions', handleWidgetCors);
+// Enable CORS middleware on ALL public and test helper routes
+router.use(handleWidgetCors);
 
 // ── 1. Cached Widget Config Delivery ──────────────────────────────────────────
 
-router.get('/widgets/:id/config', handleWidgetCors, async (req, res, next) => {
+router.get('/widgets/:id/config', async (req, res, next) => {
   try {
     const widget = await widgetStore.getWidgetById(req.params.id);
     if (!widget) {
@@ -52,7 +52,7 @@ router.get('/widgets/:id/config', handleWidgetCors, async (req, res, next) => {
 
 // ── 2. Public Submission Endpoint ─────────────────────────────────────────────
 
-router.post('/submissions', handleWidgetCors, rateLimitSubmissions, async (req, res, next) => {
+router.post('/submissions', rateLimitSubmissions, async (req, res, next) => {
   try {
     const { widget_id, payload, _hp_trap, submit_speed_ms } = req.body || {};
 

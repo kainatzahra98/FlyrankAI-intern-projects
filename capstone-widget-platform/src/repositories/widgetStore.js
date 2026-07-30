@@ -21,9 +21,9 @@ class WidgetStore {
     this._seedDefaults();
   }
 
-  async _seedDefaults() {
+  _seedDefaults() {
     // Default admin user (Customer)
-    const hash = await bcrypt.hash('password123', 10);
+    const hash = bcrypt.hashSync('password123', 10);
     const demoUser = {
       id: 'tenant_demo_100',
       email: 'owner@flyrankai.com',

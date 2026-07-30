@@ -15,11 +15,11 @@
     .hero {
       background: linear-gradient(135deg, #1E1E2E 0%, #2D2B55 100%);
       color: #FFFFFF;
-      padding: 50px 20px;
+      padding: 40px 20px;
       text-align: center;
     }
-    .hero h1 { font-size: 32px; margin: 0 0 10px 0; }
-    .hero p { font-size: 16px; color: #A5B4FC; margin: 0; }
+    .hero h1 { font-size: 30px; margin: 0 0 10px 0; }
+    .hero p { font-size: 15px; color: #A5B4FC; margin: 0; }
     .container {
       max-width: 950px;
       margin: -25px auto 40px;
@@ -32,7 +32,7 @@
       box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       margin-bottom: 24px;
     }
-    h2 { margin-top: 0; color: #111827; font-size: 20px; }
+    h2 { margin-top: 0; color: #111827; font-size: 19px; }
     .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
     button {
       background: #4F46E5;
@@ -74,17 +74,27 @@
 
   <div class="container">
     <div class="card">
-      <h2>📌 Widget Integration Snippet</h2>
-      <p>The host site drops this single line in their HTML:</p>
-      <code style="background: #E0E7FF; color: #3730A3; padding: 8px 12px; border-radius: 6px; display: block; font-family: monospace; font-size: 13px;">
-        &lt;script src="http://localhost:4000/cdn/widget.js" data-widget-id="wgt_demo_newsletter" async&gt;&lt;/script&gt;
-      </code>
-      <p style="font-size: 13px; color: #6B7280; margin-top: 10px;">
-        👉 Look at the bottom-right corner of your browser window — the widget overlay has automatically fetched config and rendered!
-      </p>
+      <h2>📌 Widget Integration Snippet (Editable & Interactive)</h2>
+      <p style="font-size: 14px; color: #4B5563;">Edit the 1-line script tag snippet below or choose a preset to load and render different widgets dynamically on this host site:</p>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 13px; font-weight: 600; color: #374151;">Quick Widget Selector:</label>
+        <select id="widget-preset-select" onchange="loadPresetWidget(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #D1D5DB; font-size: 13px; margin-left: 8px;">
+          <option value="wgt_demo_newsletter">wgt_demo_newsletter (Exit-Intent Popover)</option>
+          <option value="wgt_demo_cta">wgt_demo_cta (Inline CTA Form)</option>
+        </select>
+      </div>
+
+      <textarea id="snippet-input" rows="2" style="width: 100%; font-family: monospace; font-size: 13px; padding: 10px; border-radius: 6px; border: 1px solid #C7D2FE; background: #EEF2FF; color: #312E81; box-sizing: border-box; outline: none;"><script src="http://localhost:4000/cdn/widget.js" data-widget-id="wgt_demo_newsletter" async></script></textarea>
+      
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button onclick="applyEditedSnippet()" style="background: #059669;">⚡ Apply & Inject Custom Snippet</button>
+        <button onclick="copyEditedSnippet()" class="secondary">📋 Copy Snippet</button>
+      </div>
+
       <div style="margin-top: 16px; padding: 14px; background: #EEF2FF; border-left: 4px solid #4F46E5; border-radius: 6px;">
         <strong style="color: #312E81;">🎨 Want to create your own custom widget?</strong>
-        <p style="margin: 4px 0 10px 0; font-size: 13px; color: #4338CA;">Customize headline, copy, layout, colors, fields & security targeting in our visual builder:</p>
+        <p style="margin: 4px 0 10px 0; font-size: 13px; color: #4338CA;">Customize headline, copy, 7 layout modes, colors, fields & security targeting in our visual builder:</p>
         <a href="/demo/widget-builder.html" target="_blank" style="display: inline-block; background: #4F46E5; color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">🎨 Open No-Code Widget Customizer Studio ➔</a>
       </div>
     </div>
@@ -127,6 +137,38 @@
     function resetRateLimiter() {
       autoResetRateLimit().then(() => {
         document.getElementById('log-output').innerText = '🔄 Rate limiter counter reset! Console ready for new tests.';
+      });
+    }
+
+    // Editable Snippet Handlers
+    function loadPresetWidget(widgetId) {
+      const code = `<script src="http://localhost:4000/cdn/widget.js" data-widget-id="${widgetId}" async></` + `script>`;
+      document.getElementById('snippet-input').value = code;
+      applyEditedSnippet();
+    }
+
+    function applyEditedSnippet() {
+      const snippetText = document.getElementById('snippet-input').value;
+      const match = snippetText.match(/data-widget-id=["']([^"']+)["']/);
+      const widgetId = match ? match[1] : 'wgt_demo_newsletter';
+
+      // Clean up previous widget DOM elements
+      document.querySelectorAll('.fr-widget-overlay, .fr-widget-backdrop, .fr-bubble-btn').forEach(el => el.remove());
+
+      // Inject new script element
+      const script = document.createElement('script');
+      script.src = 'http://localhost:4000/cdn/widget.js';
+      script.setAttribute('data-widget-id', widgetId);
+      script.async = true;
+      document.body.appendChild(script);
+
+      log(`⚡ Custom snippet applied! Injected script for widget_id: "${widgetId}"`);
+    }
+
+    function copyEditedSnippet() {
+      const code = document.getElementById('snippet-input').value;
+      navigator.clipboard.writeText(code).then(() => {
+        log('📋 Snippet code copied to clipboard!');
       });
     }
 

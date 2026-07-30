@@ -38,105 +38,127 @@
     var bgColor = theme.background_color || '#FFFFFF';
     var textColor = theme.text_color || '#1F2937';
     var borderRadius = theme.border_radius || '12px';
+    var layoutType = config.widget_type || 'popover';
 
-    // Inject Styles
+    // Inject Base & Layout-Specific Styles
     var styleEl = document.createElement('style');
+    
+    var layoutStyles = '';
+    if (layoutType === 'top_banner') {
+      layoutStyles = `
+        .fr-widget-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          width: 100%;
+          border-radius: 0;
+          box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+          z-index: 999999;
+          padding: 12px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+        .fr-widget-form { flex-direction: row !important; align-items: center; gap: 10px !important; }
+      `;
+    } else if (layoutType === 'bottom_slidein') {
+      layoutStyles = `
+        .fr-widget-overlay {
+          position: fixed;
+          bottom: 20px; left: 20px;
+          width: 350px; max-width: 90vw;
+          border-radius: ${borderRadius};
+          z-index: 999999;
+        }
+      `;
+    } else if (layoutType === 'fullscreen_modal') {
+      layoutStyles = `
+        .fr-widget-backdrop {
+          position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+          background: rgba(17, 24, 39, 0.75);
+          backdrop-filter: blur(4px);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 999999;
+        }
+        .fr-widget-overlay {
+          width: 460px; max-width: 90vw;
+          border-radius: ${borderRadius};
+          z-index: 1000000;
+        }
+      `;
+    } else if (layoutType === 'floating_bubble') {
+      layoutStyles = `
+        .fr-bubble-btn {
+          position: fixed; bottom: 24px; right: 24px;
+          width: 60px; height: 60px; border-radius: 50%;
+          background: ${primaryColor}; color: white;
+          border: none; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+          font-size: 24px; cursor: pointer; z-index: 999999;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .fr-widget-overlay {
+          position: fixed; bottom: 96px; right: 24px;
+          width: 350px; max-width: 90vw;
+          border-radius: ${borderRadius};
+          z-index: 999999; display: none;
+        }
+      `;
+    } else {
+      // Default popover / cta / signup_form
+      layoutStyles = `
+        .fr-widget-overlay {
+          position: fixed; bottom: 24px; right: 24px;
+          width: 360px; max-width: 90vw;
+          border-radius: ${borderRadius};
+          z-index: 999999;
+        }
+      `;
+    }
+
     styleEl.innerHTML = `
+      ${layoutStyles}
       .fr-widget-overlay {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        width: 360px;
-        max-width: 90vw;
         background: ${bgColor};
         color: ${textColor};
-        border-radius: ${borderRadius};
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
         border: 1px solid #E5E7EB;
-        padding: 24px;
+        padding: 20px;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        z-index: 999999;
-        transition: all 0.3s ease;
+        box-sizing: border-box;
       }
       .fr-widget-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 12px;
+        display: flex; justify-content: space-between; align-items: flex-start;
+        margin-bottom: 10px;
       }
       .fr-widget-title {
-        font-size: 18px;
-        font-weight: 700;
-        margin: 0;
-        color: ${textColor};
-        line-height: 1.3;
+        font-size: 17px; font-weight: 700; margin: 0; color: ${textColor}; line-height: 1.3;
       }
       .fr-widget-close {
-        background: none;
-        border: none;
-        font-size: 20px;
-        cursor: pointer;
-        color: #9CA3AF;
-        padding: 0 4px;
-        line-height: 1;
+        background: none; border: none; font-size: 20px; cursor: pointer; color: #9CA3AF; padding: 0 4px;
       }
       .fr-widget-close:hover { color: #4B5563; }
       .fr-widget-copy {
-        font-size: 14px;
-        color: #4B5563;
-        margin-bottom: 16px;
-        line-height: 1.5;
+        font-size: 13px; color: #4B5563; margin-bottom: 14px; line-height: 1.4;
       }
       .fr-widget-form {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+        display: flex; flex-direction: column; gap: 10px;
       }
       .fr-widget-input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #D1D5DB;
-        border-radius: 6px;
-        font-size: 14px;
-        box-sizing: border-box;
-        outline: none;
+        width: 100%; padding: 9px 12px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 13px; box-sizing: border-box; outline: none;
       }
       .fr-widget-input:focus {
-        border-color: ${primaryColor};
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        border-color: ${primaryColor}; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
       }
-      .fr-widget-hp {
-        display: none !important;
-        position: absolute;
-        left: -9999px;
-      }
+      .fr-widget-hp { display: none !important; position: absolute; left: -9999px; }
       .fr-widget-btn {
-        background: ${primaryColor};
-        color: #FFFFFF;
-        border: none;
-        padding: 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: opacity 0.2s;
+        background: ${primaryColor}; color: #FFFFFF; border: none; padding: 10px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap;
       }
       .fr-widget-btn:hover { opacity: 0.9; }
       .fr-widget-btn:disabled { opacity: 0.6; cursor: not-allowed; }
       .fr-widget-success {
-        background: #DEF7EC;
-        color: #03543F;
-        padding: 12px;
-        border-radius: 6px;
-        font-size: 14px;
-        text-align: center;
-        font-weight: 500;
+        background: #DEF7EC; color: #03543F; padding: 10px; border-radius: 6px; font-size: 13px; text-align: center; font-weight: 500;
       }
       .fr-widget-badge {
-        font-size: 10px;
-        color: #9CA3AF;
-        text-align: center;
-        margin-top: 12px;
+        font-size: 10px; color: #9CA3AF; text-align: center; margin-top: 10px;
       }
     `;
     document.head.appendChild(styleEl);
@@ -162,13 +184,12 @@
       `;
     });
 
-    // Honeypot Trap Input
     var honeypotHtml = `<input type="text" name="_hp_trap" value="" class="fr-widget-hp" tabindex="-1" autocomplete="off" />`;
 
     container.innerHTML = `
       <div class="fr-widget-header">
         <h3 class="fr-widget-title">${escapeHtml(config.headline)}</h3>
-        <button class="fr-widget-close" onclick="document.getElementById('fr-widget-${config.id}').remove()">&times;</button>
+        <button class="fr-widget-close" onclick="closeWidget('${config.id}', '${layoutType}')">&times;</button>
       </div>
       <p class="fr-widget-copy">${escapeHtml(config.copy)}</p>
       <form class="fr-widget-form" id="fr-form-${config.id}">
@@ -176,10 +197,40 @@
         ${honeypotHtml}
         <button type="submit" class="fr-widget-btn" id="fr-btn-${config.id}">${escapeHtml(config.cta_text || 'Submit')}</button>
       </form>
-      <div class="fr-widget-badge">Powered by FlyRank Widget Engine</div>
+      <div class="fr-widget-badge">Powered by FlyRank Engine</div>
     `;
 
-    document.body.appendChild(container);
+    // Handle Fullscreen Backdrop or Bubble Wrapper
+    if (layoutType === 'fullscreen_modal') {
+      var backdrop = document.createElement('div');
+      backdrop.className = 'fr-widget-backdrop';
+      backdrop.id = 'fr-backdrop-' + config.id;
+      backdrop.appendChild(container);
+      document.body.appendChild(backdrop);
+    } else if (layoutType === 'floating_bubble') {
+      var bubbleBtn = document.createElement('button');
+      bubbleBtn.className = 'fr-bubble-btn';
+      bubbleBtn.id = 'fr-bubble-' + config.id;
+      bubbleBtn.innerHTML = '💬';
+      bubbleBtn.onclick = function() {
+        var card = document.getElementById('fr-widget-' + config.id);
+        card.style.display = (card.style.display === 'block') ? 'none' : 'block';
+      };
+      document.body.appendChild(bubbleBtn);
+      document.body.appendChild(container);
+    } else {
+      document.body.appendChild(container);
+    }
+
+    window.closeWidget = function(id, layout) {
+      if (layout === 'fullscreen_modal') {
+        var backdrop = document.getElementById('fr-backdrop-' + id);
+        if (backdrop) backdrop.remove();
+      } else {
+        var card = document.getElementById('fr-widget-' + id);
+        if (card) card.remove();
+      }
+    };
 
     // Attach Submission Handler
     var form = document.getElementById('fr-form-' + config.id);

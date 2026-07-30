@@ -151,12 +151,17 @@ router.post('/submissions', handleWidgetCors, rateLimitSubmissions, async (req, 
   }
 });
 
-// ── Test Toggle Endpoint (For Geo Fallback Testing) ─────────────────────────
+// ── Test Helper Endpoints ───────────────────────────────────────────────────
 
 router.post('/test/toggle-geo-provider', (req, res) => {
   const { primaryDown, secondaryDown } = req.body || {};
   const state = widgetStore.setGeoProviderState({ primaryDown, secondaryDown });
   return res.json({ message: 'Geo provider state updated', state });
+});
+
+router.post('/test/reset-ratelimit', (req, res) => {
+  widgetStore.resetRateLimits();
+  return res.json({ message: 'Rate limit counter reset for testing' });
 });
 
 module.exports = router;

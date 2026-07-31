@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Sitemap & Toolkit — Week 1 | Kainat Bibi</title>
+  <meta name="description" content="Week 1 Task 2: Portfolio sitemap sketch, AI toolkit setup, Claude Project workspace configuration, and pressure-test prompt output — Kainat Bibi, FlyrankAI Intern." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --border: rgba(255,255,255,0.07);
+      --border-active: rgba(139,92,246,0.4);
+      --text-primary: #f0f0ff;
+      --text-secondary: #9090b0;
+      --text-muted: #5a5a7a;
+      --accent-violet: #8b5cf6;
+      --accent-indigo: #6366f1;
+      --accent-pink: #ec4899;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --gradient-1: linear-gradient(135deg, #8b5cf6, #6366f1);
+      --gradient-2: linear-gradient(135deg, #ec4899, #8b5cf6);
+      --gradient-3: linear-gradient(135deg, #06b6d4, #6366f1);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(139,92,246,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(99,102,241,0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 10%, rgba(6,182,212,0.04) 0%, transparent 40%);
+      animation: bgShift 20s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes bgShift {
+      0%   { transform: translate(0,0) rotate(0deg); }
+      100% { transform: translate(-2%,-2%) rotate(1deg); }
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header { padding: 60px 0 40px; text-align: center; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c4b5fd;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-violet);
+      box-shadow: 0 0 8px var(--accent-violet);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:0.5; transform:scale(0.8); }
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 580px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .meta-chips {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ── SECTION ── */
+    .section { margin: 60px 0; }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .section-num {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--gradient-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .section-title { font-size: 1.4rem; font-weight: 700; }
+    .section-desc  { font-size: 13.5px; color: var(--text-secondary); margin-top: 3px; }
+
+    /* ── PROOF STATEMENT ── */
+    .proof-box {
+      background: linear-gradient(135deg, rgba(139,92,246,0.08), rgba(99,102,241,0.05));
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: var(--radius);
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .proof-box::before {
+      content: '"';
+      position: absolute;
+      top: -10px; left: 20px;
+      font-size: 120px;
+      font-family: Georgia, serif;
+      color: rgba(139,92,246,0.12);
+      line-height: 1;
+    }
+
+    .proof-text {
+      font-size: 1.05rem;
+      line-height: 1.85;
+      color: var(--text-primary);
+      position: relative;
+      z-index: 1;
+    }
+
+    .proof-text strong { color: #c4b5fd; }
+
+    .proof-why {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    .proof-why strong { color: var(--accent-amber); font-style: normal; }
+
+    /* ── SITEMAP ── */
+    .sitemap-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      padding: 40px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* visitor entry */
+    .sm-visitor {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .sm-person {
+      background: rgba(6,182,212,0.12);
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 100px;
+      padding: 8px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #67e8f9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sm-arrow-down {
+      width: 2px;
+      height: 32px;
+      background: linear-gradient(to bottom, rgba(139,92,246,0.6), rgba(139,92,246,0.15));
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .sm-arrow-down::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 8px solid rgba(139,92,246,0.5);
+    }
+
+    /* Pages row */
+    .sm-pages {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      position: relative;
+    }
+
+    /* horizontal connecting line */
+    .sm-pages::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 120px);
+      height: 2px;
+      background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(139,92,246,0.35) 15%,
+        rgba(139,92,246,0.35) 85%,
+        transparent 100%
+      );
+    }
+
+    .sm-page-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      flex: 1;
+      min-width: 160px;
+      max-width: 200px;
+    }
+
+    .sm-vertical-line {
+      width: 2px;
+      height: 28px;
+      background: linear-gradient(to bottom, rgba(139,92,246,0.4), rgba(139,92,246,0.1));
+    }
+
+    .sm-page-card {
+      width: 100%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px 14px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .sm-page-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-3px);
+      background: var(--bg-card-hover);
+    }
+
+    .sm-page-icon { font-size: 22px; margin-bottom: 8px; }
+
+    .sm-page-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .sm-page-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .sm-page-desc {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .sm-page-earns {
+      margin-top: 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--accent-emerald);
+    }
+
+    .page-hero    { border-color: rgba(139,92,246,0.3); }
+    .page-work    { border-color: rgba(6,182,212,0.3); }
+    .page-about   { border-color: rgba(245,158,11,0.3); }
+    .page-contact { border-color: rgba(236,72,153,0.4); }
+
+    /* CTA arrow */
+    .sm-cta-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin-top: 24px;
+    }
+
+    .sm-cta-lines {
+      display: flex;
+      gap: 100px;
+      justify-content: center;
+    }
+
+    .sm-cta-btn {
+      background: linear-gradient(135deg, #ec4899, #8b5cf6);
+      border: none;
+      border-radius: 100px;
+      padding: 12px 32px;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      cursor: default;
+      box-shadow: 0 0 24px rgba(236,72,153,0.35);
+      letter-spacing: 0.02em;
+      margin-top: 20px;
+    }
+
+    .sm-one-action {
+      margin-top: 12px;
+      font-size: 11.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── CLAUDE PROJECT SECTION ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 720px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .instructions-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      font-size: 13px;
+      line-height: 1.75;
+      color: var(--text-secondary);
+    }
+
+    .instructions-block strong { color: var(--text-primary); font-weight: 600; }
+
+    .screenshot-img {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      object-fit: cover;
+      object-position: top left;
+    }
+
+    /* ── PRESSURE TEST ── */
+    .chat-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .chat-bar {
+      background: rgba(139,92,246,0.08);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-red   { background: #ef4444; }
+    .dot-amber { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+
+    .chat-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+
+    .msg {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .msg-avatar {
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .msg-user .msg-avatar { background: rgba(139,92,246,0.2); border: 1px solid rgba(139,92,246,0.3); }
+    .msg-ai   .msg-avatar { background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.2); }
+
+    .msg-bubble {
+      flex: 1;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .msg-user .msg-bubble {
+      background: rgba(139,92,246,0.1);
+      border: 1px solid rgba(139,92,246,0.2);
+      color: var(--text-primary);
+    }
+
+    .msg-ai .msg-bubble {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+    }
+
+    .msg-ai .msg-bubble strong { color: var(--text-primary); }
+
+    .msg-name {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+
+    .msg-user .msg-name { color: #a78bfa; }
+    .msg-ai   .msg-name { color: #f9a8d4; }
+
+    /* Change noted box */
+    .change-noted {
+      background: rgba(16,185,129,0.07);
+      border: 1px solid rgba(16,185,129,0.25);
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      margin-top: 24px;
+    }
+
+    .change-noted-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-emerald);
+      margin-bottom: 10px;
+    }
+
+    .change-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .change-item::before {
+      content: '→';
+      color: var(--accent-emerald);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    /* ── TOOLKIT GRID ── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(16,185,129,0.35);
+      transform: translateY(-2px);
+    }
+
+    .tool-icon { font-size: 26px; flex-shrink: 0; }
+    .tool-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+    .tool-role { font-size: 11.5px; color: var(--text-secondary); margin-top: 2px; }
+    .tool-status { font-size: 12px; color: var(--accent-emerald); font-weight: 500; margin-top: 3px; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    footer span { color: var(--accent-violet); }
+
+    /* ── FADE IN ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.6s forwards;
+    }
+
+    @keyframes fadeIn { to { opacity:1; transform:translateY(0); } }
+
+    .fade-in:nth-child(1) { animation-delay: 0.1s; }
+    .fade-in:nth-child(2) { animation-delay: 0.2s; }
+    .fade-in:nth-child(3) { animation-delay: 0.3s; }
+    .fade-in:nth-child(4) { animation-delay: 0.4s; }
+    .fade-in:nth-child(5) { animation-delay: 0.5s; }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
+
+    /* back link */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 32px;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: #c4b5fd; }
+
+    @media (max-width: 600px) {
+      .sm-pages::before { display: none; }
+      .sm-page-col { min-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="fade-in">
+    <a href="index.html" class="back-link">← Back to FL-01 Workflow Audit</a>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      AI Fluency Internship · Week 1 · Draw the Path
+    </div>
+    <h1>Portfolio Sitemap & Toolkit</h1>
+    <p class="subtitle">One claim. One person. One action. Four pages. Everything else is noise.</p>
+    <div class="meta-chips">
+      <span class="chip">👩‍💻 Kainat Bibi</span>
+      <span class="chip">🏢 FlyrankAI Intern</span>
+      <span class="chip">📅 July 2026</span>
+      <span class="chip">🗺️ Week 1 — Draw the Path</span>
+    </div>
+  </header>
+
+  <!-- SECTION 1: PROOF STATEMENT -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Proof Statement</div>
+        <div class="section-desc">One claim · one person · one action</div>
+      </div>
+    </div>
+
+    <div class="proof-box">
+      <p class="proof-text">
+        I build <strong>production-ready full-stack web applications and AI-powered data pipelines</strong> — the kind that actually get deployed, not just demoed. I'm proving this to <strong>a technical recruiter or hiring manager at an early-stage startup or mid-size tech company</strong> who needs a developer who can own a feature from backend logic to shipped UI without constant hand-holding. The one action I want them to take is <strong>to email me to set up a conversation</strong>. A CV lists skills; this portfolio proves execution — it shows working code, real architecture decisions, and the reasoning behind them.
+      </p>
+      <div class="proof-why">
+        <strong>Why this needs to exist:</strong> A LinkedIn profile and a CV can say "built full-stack apps" — but they cannot show the diff, the debug session, the architecture trade-off. This portfolio shows the work in the form that only a person who actually did it can produce.
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: SITEMAP -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Portfolio Sitemap</div>
+        <div class="section-desc">4 pages — every one earns its place against the claim and the one action</div>
+      </div>
+    </div>
+
+    <div class="sitemap-wrap">
+
+      <!-- Visitor -->
+      <div class="sm-visitor">
+        <div class="sm-person">👤 Technical Recruiter / Hiring Manager at a Startup</div>
+      </div>
+      <div class="sm-arrow-down"></div>
+
+      <!-- Pages -->
+      <div class="sm-pages">
+
+        <div class="sm-page-col">
+          <div class="sm-vertical-line"></div>
+          <div class="sm-page-card page-hero">
+            <div class="sm-page-icon">🏠</div>
+            <div class="sm-page-name">Home / Hero</div>
+            <div class="sm-page-url">/</div>
+            <div class="sm-page-desc">States the claim in one sentence. Shows my name + role. CTA to Work.</div>
+            <div class="sm-page-earns">✓ Makes the claim immediately</div>
+          </div>
+        </div>
+
+        <div class="sm-page-col">
+          <div class="sm-vertical-line"></div>
+          <div class="sm-page-card page-work">
+            <div class="sm-page-icon">💼</div>
+            <div class="sm-page-name">Work / Projects</div>
+            <div class="sm-page-url">/work</div>
+            <div class="sm-page-desc">2–3 case studies. Real problem → my solution → outcome. Links to code.</div>
+            <div class="sm-page-earns">✓ Proves the claim with evidence</div>
+          </div>
+        </div>
+
+        <div class="sm-page-col">
+          <div class="sm-vertical-line"></div>
+          <div class="sm-page-card page-about">
+            <div class="sm-page-icon">🙋‍♀️</div>
+            <div class="sm-page-name">About</div>
+            <div class="sm-page-url">/about</div>
+            <div class="sm-page-desc">Short. Who I am, my stack, internship context. Makes me a person, not a résumé.</div>
+            <div class="sm-page-earns">✓ Builds trust before the ask</div>
+          </div>
+        </div>
+
+        <div class="sm-page-col">
+          <div class="sm-vertical-line"></div>
+          <div class="sm-page-card page-contact">
+            <div class="sm-page-icon">✉️</div>
+            <div class="sm-page-name">Contact</div>
+            <div class="sm-page-url">/contact</div>
+            <div class="sm-page-desc">Email link + one-liner. Zero friction. No form, no CAPTCHA, no hoops.</div>
+            <div class="sm-page-earns">✓ Is the one action</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA -->
+      <div class="sm-cta-wrap">
+        <div class="sm-arrow-down"></div>
+        <div class="sm-cta-btn">✉️ Email Kainat to Set Up a Conversation</div>
+        <div class="sm-one-action">⬆ The One Action — Everything points here</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SECTION 3: AI TOOLKIT -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">AI Toolkit Setup</div>
+        <div class="section-desc">Accounts across all four tools — Claude is my main build partner</div>
+      </div>
+    </div>
+
+    <div class="tools-grid">
+      <div class="tool-card">
+        <span class="tool-icon">🤖</span>
+        <div>
+          <div class="tool-name">Claude</div>
+          <div class="tool-role">Main build partner — Project configured</div>
+          <div class="tool-status">✓ Active · Primary</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">💬</span>
+        <div>
+          <div class="tool-name">ChatGPT</div>
+          <div class="tool-role">Secondary reference &amp; comparison</div>
+          <div class="tool-status">✓ Account active</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">✨</span>
+        <div>
+          <div class="tool-name">Gemini</div>
+          <div class="tool-role">Google-ecosystem research tasks</div>
+          <div class="tool-status">✓ Account active</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">🔍</span>
+        <div>
+          <div class="tool-name">Perplexity</div>
+          <div class="tool-role">Real-time web search + sourcing</div>
+          <div class="tool-status">✓ Account active</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 4: CLAUDE PROJECT -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">Claude Project — Portfolio Build Workspace</div>
+        <div class="section-desc">Custom instructions with proof statement pasted in — follows me for all 8 weeks</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-label">📋 Custom Instructions</div>
+        <div class="instructions-block">
+          <p><strong>Project name:</strong> Kainat's Portfolio Build — AI Fluency</p><br/>
+          <p><strong>Who I am:</strong> I'm Kainat Bibi, a computer science student and intern at FlyrankAI. I'm building a developer portfolio over 8 weeks to prove I can ship production-ready full-stack web apps and AI-powered data pipelines.</p><br/>
+          <p><strong>My proof statement:</strong> I build production-ready full-stack web applications and AI-powered data pipelines, for a technical recruiter or hiring manager at an early-stage startup, so they will email me to set up a conversation.</p><br/>
+          <p><strong>How to act:</strong> Act as a tutor — don't write things for me, interview me instead. Ask sharp, narrowing questions. Explain your reasoning. Flag when I'm drifting from my claim or audience. Push back if I add pages or features that don't serve the one action.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">📸 Project Screenshot</div>
+        <img
+          src="claude-project-screenshot.png"
+          alt="Claude Project configured for Kainat's Portfolio Build with custom instructions"
+          class="screenshot-img"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5: PRESSURE TEST -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div>
+        <div class="section-title">Pressure-Test Prompt &amp; Output</div>
+        <div class="section-desc">Ran inside the Claude Project — sitemap tested against claim and one action</div>
+      </div>
+    </div>
+
+    <div class="chat-wrap">
+      <div class="chat-bar">
+        <span class="chat-dot dot-red"></span>
+        <span class="chat-dot dot-amber"></span>
+        <span class="chat-dot dot-green"></span>
+        &nbsp; Claude · Kainat's Portfolio Build — AI Fluency
+      </div>
+      <div class="chat-body">
+
+        <!-- User prompt -->
+        <div class="msg msg-user">
+          <div class="msg-avatar">👩</div>
+          <div>
+            <div class="msg-name">Kainat</div>
+            <div class="msg-bubble">
+              Here's my sitemap: Home (hero + claim), Work (case studies), About (short bio), Contact (email link), and I was also thinking of adding a Blog page to show I'm thinking about tech topics, and maybe a Skills page listing my stack. My one action is getting them to email me. Does this map hold up against my claim?
+            </div>
+          </div>
+        </div>
+
+        <!-- Claude response -->
+        <div class="msg msg-ai">
+          <div class="msg-avatar">🤖</div>
+          <div>
+            <div class="msg-name">Claude — Portfolio Tutor</div>
+            <div class="msg-bubble">
+              <strong>The core four are solid.</strong> Home → Work → About → Contact is a clean path that earns every step: you state the claim, prove it, make yourself human, then give them exactly one door. That path works.<br/><br/>
+
+              <strong>The Blog and Skills pages don't earn their place — here's why.</strong><br/><br/>
+
+              A Blog page puts the visitor on a side road. They came to evaluate whether to hire you; now they're reading about distributed systems. That's not closer to emailing you — it's further. If the posts are thin or old (and most early portfolio blogs are), it signals the opposite of execution. You can always link one strong article from a Work case study if it's genuinely relevant.<br/><br/>
+
+              A Skills page is the "CV pasted as HTML" trap. You already said you build production-ready full-stack apps — the Work page proves that with actual projects. A list of logos (React, Node, Python…) adds nothing a recruiter can't see in 5 seconds on your GitHub. Worse, it invites the visitor to spend time reading a list instead of looking at your work.<br/><br/>
+
+              <strong>One sharpening question:</strong> On your Work page, are you planning 2–3 deep case studies, or a grid of many projects? For your audience (a recruiter at a startup who needs someone who can ship), two strong case studies with real problem → decision → outcome will outperform eight thumbnail cards every time. Which direction are you leaning?
+            </div>
+          </div>
+        </div>
+
+        <!-- User follow-up -->
+        <div class="msg msg-user">
+          <div class="msg-avatar">👩</div>
+          <div>
+            <div class="msg-name">Kainat</div>
+            <div class="msg-bubble">
+              That makes sense. I'll drop the Blog and Skills pages. I was leaning toward a grid but now I'm thinking 2–3 case studies. Should the About page have a CV download on it?
+            </div>
+          </div>
+        </div>
+
+        <!-- Claude response 2 -->
+        <div class="msg msg-ai">
+          <div class="msg-avatar">🤖</div>
+          <div>
+            <div class="msg-name">Claude — Portfolio Tutor</div>
+            <div class="msg-bubble">
+              <strong>Yes, a CV download on the About page is fine</strong> — it doesn't compete with your one action, it supports it. A recruiter who downloads your CV is warmer, not distracted. Just make sure the primary CTA everywhere is still "email me" and the download is a secondary option, not a replacement.<br/><br/>
+              <strong>Your revised sitemap is clean.</strong> Four pages, every one justified. You're in good shape to move to Week 2.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Change noted -->
+    <div class="change-noted">
+      <div class="change-noted-label">✅ One Change Noted from Pressure-Test</div>
+      <div class="change-item">
+        <span><strong>Removed Blog and Skills pages.</strong> Claude correctly identified that a Blog page pulls visitors off the conversion path without helping them decide to email me. A Skills page is redundant — the Work case studies prove skills with actual evidence. My final sitemap is: <strong>Home → Work → About → Contact</strong> and nothing more. I also decided to go with 2–3 deep case studies instead of a grid of many projects, based on Claude's follow-up question about my audience.</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>Week 1 · Draw the Path · <span>Kainat Bibi</span> · FlyrankAI Intern · 2026</p>
+</footer>
+
+</body>
+</html>

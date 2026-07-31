@@ -1,0 +1,12 @@
+{
+  "name": "week-1-assignment",
+  "version": "1.0.0",
+  "description": "Week 1 Assignment – Minimal JSON API Server with two endpoints",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["http", "api", "json", "node"],
+  "author": "Flyrankai",
+  "license": "MIT"
+}

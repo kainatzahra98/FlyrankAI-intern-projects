@@ -1,0 +1,18 @@
+{
+  "name": "week-2-assignment",
+  "version": "1.0.0",
+  "description": "Week 2 Assignment – Postgres + Docker + Repository Pattern",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": ["postgres", "docker", "repository-pattern", "node", "express"],
+  "author": "Flyrankai",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  }
+}

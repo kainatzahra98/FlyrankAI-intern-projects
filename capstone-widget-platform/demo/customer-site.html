@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customer Website — External Origin Demo</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #F3F4F6;
+      color: #1F2937;
+    }
+    .hero {
+      background: linear-gradient(135deg, #1E1E2E 0%, #2D2B55 100%);
+      color: #FFFFFF;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .hero h1 { font-size: 30px; margin: 0 0 10px 0; }
+    .hero p { font-size: 15px; color: #A5B4FC; margin: 0; }
+    .container {
+      max-width: 950px;
+      margin: -25px auto 40px;
+      padding: 0 20px;
+    }
+    .card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 24px;
+    }
+    h2 { margin-top: 0; color: #111827; font-size: 19px; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    button {
+      background: #4F46E5;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { background: #4338CA; transform: translateY(-1px); }
+    button.danger { background: #DC2626; }
+    button.danger:hover { background: #B91C1C; }
+    button.warning { background: #D97706; }
+    button.warning:hover { background: #B45309; }
+    button.secondary { background: #4B5563; }
+    button.secondary:hover { background: #374151; }
+    #log-output {
+      background: #1E1E2E;
+      color: #A6ACCD;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      height: 240px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <h1>🌐 External Customer Website (Simulated 2nd Origin)</h1>
+    <p>This page represents a customer site loading the widget script cross-origin.</p>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h2>📌 Widget Integration Snippet (Editable & Interactive)</h2>
+      <p style="font-size: 14px; color: #4B5563;">Edit the 1-line script tag snippet below or choose a preset to load and render different widgets dynamically on this host site:</p>
+      
+      <div style="margin-bottom: 12px;">
+        <label style="font-size: 13px; font-weight: 600; color: #374151;">Quick Widget Selector:</label>
+        <select id="widget-preset-select" onchange="loadPresetWidget(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid #D1D5DB; font-size: 13px; margin-left: 8px;">
+          <option value="wgt_demo_newsletter">wgt_demo_newsletter (Exit-Intent Popover)</option>
+          <option value="wgt_demo_cta">wgt_demo_cta (Inline CTA Form)</option>
+        </select>
+      </div>
+
+      <textarea id="snippet-input" rows="2" style="width: 100%; font-family: monospace; font-size: 13px; padding: 10px; border-radius: 6px; border: 1px solid #C7D2FE; background: #EEF2FF; color: #312E81; box-sizing: border-box; outline: none;"><script src="http://localhost:4000/cdn/widget.js" data-widget-id="wgt_demo_newsletter" async></script></textarea>
+      
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+        <button onclick="applyEditedSnippet()" style="background: #059669;">⚡ Apply & Inject Custom Snippet</button>
+        <button onclick="addAnotherSnippet()" style="background: #4F46E5;">➕ Add Another Widget Snippet</button>
+        <button onclick="copyEditedSnippet()" class="secondary">📋 Copy Snippet</button>
+      </div>
+
+      <div style="margin-top: 16px; padding: 14px; background: #EEF2FF; border-left: 4px solid #4F46E5; border-radius: 6px;">
+        <strong style="color: #312E81;">🎨 Want to create your own custom widget?</strong>
+        <p style="margin: 4px 0 10px 0; font-size: 13px; color: #4338CA;">Customize headline, copy, 7 layout modes, colors, fields & security targeting in our visual builder:</p>
+        <a href="/demo/widget-builder.html" target="_blank" style="display: inline-block; background: #4F46E5; color: white; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 13px;">🎨 Open No-Code Widget Customizer Studio ➔</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Interactive Attack & Capstone Verification Controls</h2>
+      <p style="font-size: 14px; color: #4B5563;">Test all core requirements of the public submission pipeline. Every button is clickable & resets limits automatically for smooth continuous testing:</p>
+
+      <div class="btn-group">
+        <button onclick="testStandardSubmit()">1. Valid Submission</button>
+        <button class="danger" onclick="testRateLimitBurst()">2. Trigger Rate Limiter (Burst 6 Reqs)</button>
+        <button class="warning" onclick="testHoneypotSpam()">3. Honeypot Bot Attack</button>
+        <button onclick="testGeoFallback()">4. Toggle Geo Provider 1 Down (Fallback Chain)</button>
+        <button onclick="testWebhookFail()">5. Simulated Side-Effect Failure (Isolation Test)</button>
+        <button class="secondary" onclick="resetRateLimiter()">🔄 Reset Rate Limiter & Clear Log</button>
+      </div>
+
+      <h3 style="margin-top: 20px; font-size: 15px; color: #111827;">Response Output Log:</h3>
+      <div id="log-output">Console ready... click buttons above to test.</div>
+    </div>
+  </div>
+
+  <!-- Real One-Line Embed Snippet -->
+  <script src="http://localhost:4000/cdn/widget.js" data-widget-id="wgt_demo_newsletter" async></script>
+
+  <!-- Control Scripts for Interactive Demo -->
+  <script>
+    function log(msg, obj) {
+      const output = document.getElementById('log-output');
+      const time = new Date().toLocaleTimeString();
+      let text = `[${time}] ${msg}`;
+      if (obj) text += '\n' + JSON.stringify(obj, null, 2);
+      output.innerText = text + '\n\n' + output.innerText;
+    }
+
+    function autoResetRateLimit() {
+      return fetch('http://localhost:4000/api/test/reset-ratelimit', { method: 'POST' }).catch(() => {});
+    }
+
+    function resetRateLimiter() {
+      autoResetRateLimit().then(() => {
+        document.getElementById('log-output').innerText = '🔄 Rate limiter counter reset! Console ready for new tests.';
+      });
+    }
+
+    // Editable Snippet Handlers
+    function loadPresetWidget(widgetId) {
+      const code = `<script src="http://localhost:4000/cdn/widget.js" data-widget-id="${widgetId}" async></` + `script>`;
+      document.getElementById('snippet-input').value = code;
+      applyEditedSnippet();
+    }
+
+    function applyEditedSnippet() {
+      const snippetText = document.getElementById('snippet-input').value;
+      const match = snippetText.match(/data-widget-id=["']([^"']+)["']/);
+      const widgetId = match ? match[1] : 'wgt_demo_newsletter';
+
+      // Clean up previous widget DOM elements
+      document.querySelectorAll('.fr-widget-overlay, .fr-widget-backdrop, .fr-bubble-btn').forEach(el => el.remove());
+
+      // Inject new script element
+      const script = document.createElement('script');
+      script.src = 'http://localhost:4000/cdn/widget.js';
+      script.setAttribute('data-widget-id', widgetId);
+      script.async = true;
+      document.body.appendChild(script);
+
+      log(`⚡ Custom snippet applied! Injected script for widget_id: "${widgetId}"`);
+    }
+
+    function copyEditedSnippet() {
+      const code = document.getElementById('snippet-input').value;
+      navigator.clipboard.writeText(code).then(() => {
+        log('📋 Snippet code copied to clipboard!');
+      });
+    }
+
+    function addAnotherSnippet() {
+      const snippetText = document.getElementById('snippet-input').value;
+      const match = snippetText.match(/data-widget-id=["']([^"']+)["']/);
+      const widgetId = match ? match[1] : 'wgt_demo_cta';
+
+      const script = document.createElement('script');
+      script.src = 'http://localhost:4000/cdn/widget.js';
+      script.setAttribute('data-widget-id', widgetId);
+      script.async = true;
+      document.body.appendChild(script);
+
+      log(`➕ Multi-Widget Embedding: Injected additional widget script for widget_id: "${widgetId}"! Multiple widgets are now running simultaneously on this page.`);
+    }
+
+    // 1. Valid Submission
+    function testStandardSubmit() {
+      autoResetRateLimit().then(() => {
+        fetch('http://localhost:4000/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            widget_id: 'wgt_demo_newsletter',
+            payload: { email: 'visitor@example.com', name: 'John Doe' }
+          })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(res => log(`✅ Submission Response (Status ${res.status}):`, res.data))
+        .catch(err => log('❌ Request Failed:', err.message));
+      });
+    }
+
+    // 2. Rate Limit Burst (6 rapid requests)
+    function testRateLimitBurst() {
+      autoResetRateLimit().then(() => {
+        log('🔥 Sending 6 rapid submissions to trigger 429 Rate Limiter...');
+        for (let i = 1; i <= 6; i++) {
+          fetch('http://localhost:4000/api/submissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              widget_id: 'wgt_demo_newsletter',
+              payload: { email: `burst_${i}@example.com` }
+            })
+          })
+          .then(res => res.json().then(data => ({ status: res.status, data })))
+          .then(res => {
+            if (res.status === 429) {
+              log(`🚫 Request ${i}: RATE LIMITED (Status 429 Too Many Requests)`, res.data);
+            } else {
+              log(`▶️ Request ${i}: Status ${res.status}`, res.data);
+            }
+          });
+        }
+      });
+    }
+
+    // 3. Honeypot Bot Attack
+    function testHoneypotSpam() {
+      autoResetRateLimit().then(() => {
+        fetch('http://localhost:4000/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            widget_id: 'wgt_demo_newsletter',
+            payload: { email: 'spambot@bad.com' },
+            _hp_trap: 'filled_by_bot_harvester' // Bot trap field
+          })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(res => log(`🤖 Honeypot Spam Test Result (Status ${res.status}):`, res.data));
+      });
+    }
+
+    // 4. Toggle Geo Fallback Provider
+    function testGeoFallback() {
+      autoResetRateLimit().then(() => {
+        fetch('http://localhost:4000/api/test/toggle-geo-provider', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ primaryDown: true })
+        })
+        .then(res => res.json())
+        .then(data => {
+          log('⚠️ Primary Geo Provider toggled DOWN! Sending submission to test Provider 2 takeover...', data);
+          fetch('http://localhost:4000/api/submissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              widget_id: 'wgt_demo_newsletter',
+              payload: { email: 'geotest@example.com' }
+            })
+          })
+          .then(res => res.json().then(data => ({ status: res.status, data })))
+          .then(res => log(`🌍 Geo Fallback Result (Status ${res.status}):`, res.data));
+        });
+      });
+    }
+
+    // 5. Simulated Side-Effect Failure
+    function testWebhookFail() {
+      autoResetRateLimit().then(() => {
+        fetch('http://localhost:4000/api/submissions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            widget_id: 'wgt_demo_newsletter',
+            payload: { email: 'sideeffect_test@example.com', _trigger_webhook_fail: true }
+          })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, data })))
+        .then(res => log(`🛡️ Side-Effect Failure Isolation (Status ${res.status} - Submission Succeeded despite webhook crash!):`, res.data));
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FlyRank — No-Code Custom Widget Builder Studio</title>
+  <style>
+    :root {
+      --primary: #4F46E5;
+      --bg: #F9FAFB;
+      --card-bg: #FFFFFF;
+      --text: #1F2937;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: linear-gradient(135deg, #1E1E2E 0%, #2D2B55 100%);
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 8px 0; font-size: 28px; }
+    header p { margin: 0; color: #A5B4FC; font-size: 15px; }
+
+    .builder-container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .builder-container { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+      border: 1px solid #E5E7EB;
+    }
+
+    h2 { font-size: 18px; margin-top: 0; margin-bottom: 16px; color: #111827; }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+    input[type="text"], select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+    .color-picker-group {
+      display: flex;
+      gap: 12px;
+    }
+    .color-input-wrapper {
+      flex: 1;
+    }
+    input[type="color"] {
+      height: 38px;
+      width: 100%;
+      border: 1px solid #D1D5DB;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 2px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+    .checkbox-group label {
+      font-weight: normal;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-create {
+      background: var(--primary);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+    .btn-create:hover { background: #4338CA; }
+
+    /* Preview Section */
+    .preview-box {
+      background: #F3F4F6;
+      border: 2px dashed #CBD5E1;
+      border-radius: 12px;
+      padding: 30px 20px;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .widget-preview-card {
+      width: 100%;
+      max-width: 380px;
+      padding: 24px;
+      box-sizing: border-box;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15);
+      border: 1px solid #E5E7EB;
+      transition: all 0.3s;
+    }
+
+    .snippet-box {
+      background: #1E1E2E;
+      color: #A6ACCD;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 13px;
+      word-break: break-all;
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .btn-copy {
+      background: #374151;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
+    .btn-copy:hover { background: #4B5563; }
+
+    .nav-links {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .nav-links a {
+      color: #4F46E5;
+      font-weight: 600;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    .nav-links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚀 FlyRank No-Code Widget Customizer Studio</h1>
+    <p>Design your custom lead popover, customize copy & styling, and generate a 1-line script tag instantly.</p>
+  </header>
+
+  <div class="nav-links">
+    <a href="/demo/customer-site.html">⬅️ Back to Customer Site Demo</a> | 
+    <a href="/" target="_blank">📡 Platform API Info</a>
+  </div>
+
+  <div class="builder-container">
+
+    <!-- Left Panel: Widget Customization Options -->
+    <div class="panel">
+      <h2>🎨 Customize Your Widget Options</h2>
+
+      <form id="builder-form">
+        <div class="form-group">
+          <label>Widget Name / Purpose</label>
+          <input type="text" id="widget_title" value="My Website Lead Generator" required />
+        </div>
+
+        <div class="form-group">
+          <label>Widget Layout Type (7 Layout Options)</label>
+          <select id="widget_type">
+            <option value="popover">1. Exit-Intent Popover Card (Bottom Right)</option>
+            <option value="signup_form">2. Inline Embedded Form Card</option>
+            <option value="cta">3. Floating Call-To-Action Button</option>
+            <option value="top_banner">4. Full-Width Top Sticky Announcement Bar</option>
+            <option value="bottom_slidein">5. Bottom-Left Slide-In Drawer Box</option>
+            <option value="floating_bubble">6. Floating Chat Lead Bubble Badge</option>
+            <option value="fullscreen_modal">7. Full-Screen Overlay Backdrop Takeover</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Headline Text</label>
+          <input type="text" id="headline" value="🔥 Get 25% Off Your Next Order!" required />
+        </div>
+
+        <div class="form-group">
+          <label>Subtitle / Body Copy</label>
+          <textarea id="copy" rows="2">Join 15,000+ members getting weekly marketing playbooks.</textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Button Label (CTA Text)</label>
+          <input type="text" id="cta_text" value="Claim Discount Now" required />
+        </div>
+
+        <div class="form-group">
+          <label>Styling & Theme Colors</label>
+          <div class="color-picker-group">
+            <div class="color-input-wrapper">
+              <label>Button Color</label>
+              <input type="color" id="primary_color" value="#4F46E5" />
+            </div>
+            <div class="color-input-wrapper">
+              <label>Background</label>
+              <input type="color" id="background_color" value="#FFFFFF" />
+            </div>
+            <div class="color-input-wrapper">
+              <label>Text Color</label>
+              <input type="color" id="text_color" value="#1F2937" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Border Radius</label>
+          <select id="border_radius">
+            <option value="12px">Rounded Corners (12px)</option>
+            <option value="6px">Subtle Radius (6px)</option>
+            <option value="24px">Pill / Heavy Curved (24px)</option>
+            <option value="0px">Sharp Corners (0px)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Custom Form Fields to Capture</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="field_email" checked disabled /> Work Email (Required)</label>
+            <label><input type="checkbox" id="field_name" checked /> Full Name</label>
+            <label><input type="checkbox" id="field_phone" /> Phone Number</label>
+            <label><input type="checkbox" id="field_company" /> Company Name</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Allowed Website Origins (Security Targeting)</label>
+          <input type="text" id="allowed_origins" value="*" placeholder="e.g. *, https://mywebsite.com" />
+        </div>
+
+        <button type="submit" class="btn-create">🚀 Save Widget & Generate Script Tag</button>
+      </form>
+    </div>
+
+    <!-- Right Panel: Live Preview & Snippet Generator -->
+    <div>
+      <div class="panel" style="margin-bottom: 24px;">
+        <h2>👁️ Live Real-Time Preview</h2>
+        <div class="preview-box">
+          <div class="widget-preview-card" id="preview-card">
+            <h3 id="prev-headline" style="margin: 0 0 8px 0; font-size: 18px;">Headline</h3>
+            <p id="prev-copy" style="font-size: 13px; color: #4B5563; margin-bottom: 16px;">Copy</p>
+            <div id="prev-fields" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;"></div>
+            <button id="prev-btn" style="width: 100%; padding: 10px; border: none; font-weight: 600; cursor: pointer; color: white;">Submit</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" id="snippet-panel" style="display: none;">
+        <h2 style="color: #059669;">✅ Your Custom Widget is Ready!</h2>
+        <p style="font-size: 14px; color: #4B5563;">Copy this 1-line script tag and drop it into any website HTML `&lt;head&gt;` or `&lt;body&gt;`:</p>
+        
+        <div class="snippet-box">
+          <button class="btn-copy" onclick="copySnippet()">📋 Copy Snippet</button>
+          <span id="snippet-code">Code will appear here...</span>
+        </div>
+
+        <p style="font-size: 13px; color: #6B7280; margin-top: 14px;">
+          Submissions from any website using this snippet will automatically be CORS-validated, rate-limited, enriched with Geo-IP data, and dashboarded under your tenant account!
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // Real-time Preview Updater
+    function updatePreview() {
+      const headline = document.getElementById('headline').value;
+      const copy = document.getElementById('copy').value;
+      const cta = document.getElementById('cta_text').value;
+      const primaryColor = document.getElementById('primary_color').value;
+      const bgColor = document.getElementById('background_color').value;
+      const textColor = document.getElementById('text_color').value;
+      const borderRadius = document.getElementById('border_radius').value;
+
+      const card = document.getElementById('preview-card');
+      card.style.backgroundColor = bgColor;
+      card.style.color = textColor;
+      card.style.borderRadius = borderRadius;
+
+      document.getElementById('prev-headline').innerText = headline || 'Your Headline';
+      document.getElementById('prev-headline').style.color = textColor;
+
+      document.getElementById('prev-copy').innerText = copy || 'Your body copy description.';
+
+      const btn = document.getElementById('prev-btn');
+      btn.innerText = cta || 'Submit';
+      btn.style.backgroundColor = primaryColor;
+      btn.style.borderRadius = '6px';
+
+      // Build fields
+      const fieldsContainer = document.getElementById('prev-fields');
+      fieldsContainer.innerHTML = `
+        <input type="email" placeholder="Work Email *" disabled style="padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px;" />
+      `;
+
+      if (document.getElementById('field_name').checked) {
+        fieldsContainer.innerHTML += `
+          <input type="text" placeholder="Full Name" disabled style="padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px;" />
+        `;
+      }
+      if (document.getElementById('field_phone').checked) {
+        fieldsContainer.innerHTML += `
+          <input type="text" placeholder="Phone Number" disabled style="padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px;" />
+        `;
+      }
+      if (document.getElementById('field_company').checked) {
+        fieldsContainer.innerHTML += `
+          <input type="text" placeholder="Company Name" disabled style="padding: 8px; border: 1px solid #CBD5E1; border-radius: 6px;" />
+        `;
+      }
+    }
+
+    // Attach listeners for real-time preview updating
+    document.querySelectorAll('input, select, textarea').forEach(el => {
+      el.addEventListener('input', updatePreview);
+      el.addEventListener('change', updatePreview);
+    });
+
+    updatePreview();
+
+    // Form Submission -> Create Widget via Admin API
+    document.getElementById('builder-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      // Login to obtain JWT admin token
+      let token = localStorage.getItem('flyrank_token');
+      if (!token) {
+        const loginRes = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: 'owner@flyrankai.com', password: 'password123' })
+        }).then(r => r.json());
+        token = loginRes.token;
+        if (token) localStorage.setItem('flyrank_token', token);
+      }
+
+      // Build fields array
+      const fields = [{ name: 'email', label: 'Work Email', type: 'email', required: true }];
+      if (document.getElementById('field_name').checked) {
+        fields.push({ name: 'name', label: 'Full Name', type: 'text', required: false });
+      }
+      if (document.getElementById('field_phone').checked) {
+        fields.push({ name: 'phone', label: 'Phone Number', type: 'tel', required: false });
+      }
+      if (document.getElementById('field_company').checked) {
+        fields.push({ name: 'company', label: 'Company Name', type: 'text', required: false });
+      }
+
+      const originsInput = document.getElementById('allowed_origins').value || '*';
+      const allowedOrigins = originsInput.split(',').map(s => s.trim()).filter(Boolean);
+
+      const widgetPayload = {
+        title: document.getElementById('widget_title').value,
+        widget_type: document.getElementById('widget_type').value,
+        headline: document.getElementById('headline').value,
+        copy: document.getElementById('copy').value,
+        cta_text: document.getElementById('cta_text').value,
+        fields: fields,
+        theme: {
+          primary_color: document.getElementById('primary_color').value,
+          background_color: document.getElementById('background_color').value,
+          text_color: document.getElementById('text_color').value,
+          border_radius: document.getElementById('border_radius').value
+        },
+        allowed_origins: allowedOrigins
+      };
+
+      const res = await fetch('/api/widgets', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(widgetPayload)
+      }).then(r => r.json());
+
+      if (res.embed_snippet) {
+        document.getElementById('snippet-code').innerText = res.embed_snippet;
+        document.getElementById('snippet-panel').style.display = 'block';
+        document.getElementById('snippet-panel').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert('Failed to save widget: ' + (res.error || 'Unknown error'));
+      }
+    });
+
+    function copySnippet() {
+      const code = document.getElementById('snippet-code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.querySelector('.btn-copy');
+        btn.innerText = '✅ Copied!';
+        setTimeout(() => btn.innerText = '📋 Copy Snippet', 2000);
+      });
+    }
+  </script>
+</body>
+</html>

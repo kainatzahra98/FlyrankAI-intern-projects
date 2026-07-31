@@ -1,0 +1,18 @@
+{
+  "name": "week-3-assignment",
+  "version": "1.0.0",
+  "description": "W3·A1 — CRUD connected to SQLite (same API, real persistence)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node tests/tasks.test.js"
+  },
+  "keywords": ["sqlite", "crud", "repository-pattern", "node", "express"],
+  "author": "Flyrankai",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "sql.js": "^1.12.0"
+  }
+}

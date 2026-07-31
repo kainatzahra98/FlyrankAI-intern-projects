@@ -1,0 +1,207 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "W4 Auth API — Supabase Authentication",
+    "description": "Week 4 Assignment — Secure API using Supabase Auth, JWTs, middleware protection, and Swagger UI.\n\n**How to test protected routes:**\n1. Use `POST /auth/login` to get an `access_token`\n2. Click the **Authorize 🔒** button above\n3. Paste your token (without 'Bearer ') and click **Authorize**\n4. All protected routes will now send your token automatically",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Flyrankai Intern Projects",
+      "url": "https://github.com/kainatzahra98/FlyrankAI-intern-projects"
+    }
+  },
+  "servers": [
+    { "url": "http://localhost:3000", "description": "Local development server" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Paste your Supabase access_token here (obtained from POST /auth/login)"
+      }
+    },
+    "schemas": {
+      "AuthCredentials": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email":    { "type": "string", "format": "email", "example": "user@example.com" },
+          "password": { "type": "string", "minLength": 6,    "example": "password123" }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "tags": [
+    { "name": "Auth",      "description": "Authentication endpoints — signup, login, logout" },
+    { "name": "Protected", "description": "🔒 Requires a valid Bearer token" },
+    { "name": "Public",    "description": "Open endpoints — no token needed" }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Create a new user account",
+        "operationId": "signup",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthCredentials" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Account created successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Account created. Check your email to confirm.",
+                  "user": { "id": "uuid", "email": "user@example.com", "created_at": "2024-01-01T00:00:00Z" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing email or password",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorResponse" } } }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Authenticate and receive a JWT access token",
+        "operationId": "login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AuthCredentials" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful — copy the access_token to authorize",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Login successful.",
+                  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                  "refresh_token": "some-refresh-token",
+                  "expires_in": 3600,
+                  "user": { "id": "uuid", "email": "user@example.com" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Missing fields" },
+          "401": {
+            "description": "Invalid credentials",
+            "content": { "application/json": { "example": { "error": "Invalid login credentials" } } }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Log out and invalidate the current session",
+        "operationId": "logout",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Logged out — no body returned" },
+          "401": { "description": "Missing or invalid token" }
+        }
+      }
+    },
+    "/public/info": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Public info — no authentication required",
+        "operationId": "publicInfo",
+        "responses": {
+          "200": {
+            "description": "Public message",
+            "content": {
+              "application/json": {
+                "example": { "message": "Welcome stranger! This info is public." }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected/profile": {
+      "get": {
+        "tags": ["Protected"],
+        "summary": "Get the authenticated user's profile data",
+        "operationId": "getProfile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Verified user profile returned",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Access granted. Here is your profile.",
+                  "user": {
+                    "id": "uuid",
+                    "email": "user@example.com",
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "email_confirmed_at": "2024-01-01T00:01:00Z",
+                    "last_sign_in_at": "2024-01-01T01:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, malformed, or expired token",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "no_token": { "value": { "error": "Access token required" } },
+                  "bad_token": { "value": { "error": "Invalid or expired token" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/protected/dashboard": {
+      "get": {
+        "tags": ["Protected"],
+        "summary": "Bonus protected dashboard (Stage 4 checkpoint)",
+        "operationId": "getDashboard",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Dashboard data returned",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Welcome to your dashboard, user@example.com!",
+                  "user_id": "uuid",
+                  "timestamp": "2024-01-01T01:00:00Z",
+                  "stats": { "routes_protected": 2, "auth_method": "Supabase JWT" }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid or missing token" }
+        }
+      }
+    }
+  }
+}

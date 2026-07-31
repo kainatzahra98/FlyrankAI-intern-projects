@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Fluency Week 1 — Workflow Audit | Kainat Bibi</title>
+  <meta name="description" content="AI Fluency Week 1 deliverable: Workflow audit table, Claude Project setup, and target task definitions for Kainat Bibi's AI Fluency certification journey." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #111118;
+      --bg-card: #16161f;
+      --bg-card-hover: #1c1c28;
+      --border: rgba(255,255,255,0.07);
+      --border-active: rgba(139,92,246,0.4);
+      --text-primary: #f0f0ff;
+      --text-secondary: #9090b0;
+      --text-muted: #5a5a7a;
+      --accent-violet: #8b5cf6;
+      --accent-indigo: #6366f1;
+      --accent-pink: #ec4899;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --gradient-1: linear-gradient(135deg, #8b5cf6, #6366f1);
+      --gradient-2: linear-gradient(135deg, #ec4899, #8b5cf6);
+      --gradient-3: linear-gradient(135deg, #06b6d4, #6366f1);
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at 20% 20%, rgba(139,92,246,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 80% 80%, rgba(99,102,241,0.06) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 10%, rgba(236,72,153,0.04) 0%, transparent 40%);
+      animation: bgShift 20s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes bgShift {
+      0% { transform: translate(0,0) rotate(0deg); }
+      100% { transform: translate(-2%,-2%) rotate(1deg); }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header {
+      padding: 60px 0 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139,92,246,0.15);
+      border: 1px solid rgba(139,92,246,0.3);
+      border-radius: 100px;
+      padding: 6px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #c4b5fd;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .badge-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-violet);
+      box-shadow: 0 0 8px var(--accent-violet);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, #c4b5fd 50%, #818cf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+    }
+
+    .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 600px;
+      margin: 0 auto 32px;
+      line-height: 1.6;
+    }
+
+    .meta-chips {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .chip-icon { font-size: 14px; }
+
+    /* ── SECTION TITLES ── */
+    .section {
+      margin: 60px 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .section-num {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--gradient-1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .section-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ── AUDIT TABLE ── */
+    .table-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead {
+      background: rgba(139,92,246,0.08);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 14px 18px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    td {
+      padding: 14px 18px;
+      font-size: 13.5px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr:hover td {
+      background: rgba(139,92,246,0.04);
+      transition: background 0.2s;
+    }
+
+    .task-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      width: 32px;
+    }
+
+    .task-name {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .classification {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .cls-just-me {
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #fca5a5;
+    }
+
+    .cls-delegate {
+      background: rgba(245,158,11,0.12);
+      border: 1px solid rgba(245,158,11,0.25);
+      color: #fcd34d;
+    }
+
+    .cls-collaborate {
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.3);
+      color: #a5b4fc;
+    }
+
+    .cls-automate {
+      background: rgba(16,185,129,0.12);
+      border: 1px solid rgba(16,185,129,0.25);
+      color: #6ee7b7;
+    }
+
+    .rationale {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    /* ── LEGEND ── */
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    /* ── CLAUDE PROJECT SECTION ── */
+    .claude-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .claude-section { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .instructions-block {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--text-secondary);
+    }
+
+    .instructions-block strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      height: 280px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      object-position: top left;
+      border: 1px solid var(--border);
+    }
+
+    /* ── TARGET TASKS ── */
+    .target-tasks {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .target-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .target-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+
+    .target-card:nth-child(1)::before { background: var(--gradient-1); }
+    .target-card:nth-child(2)::before { background: var(--gradient-3); }
+    .target-card:nth-child(3)::before { background: var(--gradient-2); }
+
+    .target-card:hover {
+      border-color: var(--border-active);
+      transform: translateY(-3px);
+      background: var(--bg-card-hover);
+    }
+
+    .target-num {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .target-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .target-cls {
+      margin-bottom: 16px;
+    }
+
+    .target-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin: 14px 0 6px;
+    }
+
+    .success-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .success-list li {
+      font-size: 13px;
+      color: var(--text-secondary);
+      padding: 4px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+
+    .success-list li::before {
+      content: '✓';
+      color: var(--accent-emerald);
+      font-weight: 700;
+      font-size: 12px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .metric-box {
+      background: rgba(16,185,129,0.07);
+      border: 1px solid rgba(16,185,129,0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #6ee7b7;
+      margin-top: 14px;
+    }
+
+    .metric-box strong { color: #34d399; }
+
+    /* ── TOOLS TABLE ── */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s;
+    }
+
+    .tool-card:hover {
+      border-color: rgba(16,185,129,0.4);
+      transform: translateY(-2px);
+    }
+
+    .tool-icon {
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+
+    .tool-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .tool-status {
+      font-size: 12px;
+      color: var(--accent-emerald);
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 40px 0 60px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    footer span {
+      color: var(--accent-violet);
+    }
+
+    /* ── ANIMATIONS ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.6s forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in:nth-child(1) { animation-delay: 0.1s; }
+    .fade-in:nth-child(2) { animation-delay: 0.2s; }
+    .fade-in:nth-child(3) { animation-delay: 0.3s; }
+    .fade-in:nth-child(4) { animation-delay: 0.4s; }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: rgba(139,92,246,0.3); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="fade-in">
+    <div class="badge">
+      <span class="badge-dot"></span>
+      AI Fluency Certification · FL-01
+    </div>
+    <h1>Week 1: Workflow Audit</h1>
+    <p class="subtitle">Mapping where AI helps, where it wastes time, and where it should never be trusted — the core fluency skill.</p>
+    <div class="meta-chips">
+      <span class="chip"><span class="chip-icon">👩‍💻</span> Kainat Bibi</span>
+      <span class="chip"><span class="chip-icon">🏢</span> FlyrankAI Intern</span>
+      <span class="chip"><span class="chip-icon">📅</span> July 2026</span>
+
+    </div>
+  </header>
+
+  <!-- PART 1: AUDIT TABLE -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div>
+        <div class="section-title">Weekly Task Workflow Audit</div>
+        <div class="section-desc">15 real recurring tasks classified using the Mollick framework</div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="classification cls-just-me">👤 Just Me</span> Human judgment required</div>
+      <div class="legend-item"><span class="classification cls-delegate">🔍 Delegate + Review</span> AI drafts, I verify</div>
+      <div class="legend-item"><span class="classification cls-collaborate">🤝 Collaborate</span> Human-AI partnership</div>
+      <div class="legend-item"><span class="classification cls-automate">⚡ Fully Automate</span> AI handles end-to-end</div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Task</th>
+            <th>Classification</th>
+            <th>Rationale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task-num">01</td>
+            <td class="task-name">Debugging backend API errors in Node.js</td>
+            <td><span class="classification cls-collaborate">🤝 Collaborate</span></td>
+            <td class="rationale">AI spots patterns fast; I must understand root cause and own the fix.</td>
+          </tr>
+          <tr>
+            <td class="task-num">02</td>
+            <td class="task-name">Writing academic reflection essays</td>
+            <td><span class="classification cls-just-me">👤 Just Me</span></td>
+            <td class="rationale">My personal voice and lived experience cannot be replicated or delegated.</td>
+          </tr>
+          <tr>
+            <td class="task-num">03</td>
+            <td class="task-name">Generating boilerplate React components</td>
+            <td><span class="classification cls-automate">⚡ Fully Automate</span></td>
+            <td class="rationale">Repetitive, predictable structure — AI output is identical to what I'd write.</td>
+          </tr>
+          <tr>
+            <td class="task-num">04</td>
+            <td class="task-name">Responding to internship supervisor feedback</td>
+            <td><span class="classification cls-just-me">👤 Just Me</span></td>
+            <td class="rationale">Requires genuine professional judgment and an authentic relationship.</td>
+          </tr>
+          <tr>
+            <td class="task-num">05</td>
+            <td class="task-name">Researching new technical concepts (e.g., vector DBs)</td>
+            <td><span class="classification cls-collaborate">🤝 Collaborate</span></td>
+            <td class="rationale">AI provides efficient starting point; I validate sources and build my own model.</td>
+          </tr>
+          <tr>
+            <td class="task-num">06</td>
+            <td class="task-name">Writing commit messages & PR descriptions</td>
+            <td><span class="classification cls-delegate">🔍 Delegate + Review</span></td>
+            <td class="rationale">AI drafts solid messages; I review for accuracy and alignment with the actual diff.</td>
+          </tr>
+          <tr>
+            <td class="task-num">07</td>
+            <td class="task-name">Brainstorming project feature ideas</td>
+            <td><span class="classification cls-collaborate">🤝 Collaborate</span></td>
+            <td class="rationale">AI expands my thinking; I evaluate feasibility, user needs, and priority myself.</td>
+          </tr>
+          <tr>
+            <td class="task-num">08</td>
+            <td class="task-name">Setting up Docker / .env configs</td>
+            <td><span class="classification cls-delegate">🔍 Delegate + Review</span></td>
+            <td class="rationale">AI generates a reasonable config; I review for security and project-specific needs.</td>
+          </tr>
+          <tr>
+            <td class="task-num">09</td>
+            <td class="task-name">Planning my weekly study schedule</td>
+            <td><span class="classification cls-just-me">👤 Just Me</span></td>
+            <td class="rationale">Only I know my energy levels, real deadlines, and personal priorities each week.</td>
+          </tr>
+          <tr>
+            <td class="task-num">10</td>
+            <td class="task-name">Writing CSS styling for UI components</td>
+            <td><span class="classification cls-delegate">🔍 Delegate + Review</span></td>
+            <td class="rationale">AI produces functional CSS quickly; I review for design consistency and responsiveness.</td>
+          </tr>
+          <tr>
+            <td class="task-num">11</td>
+            <td class="task-name">Summarizing long technical documentation</td>
+            <td><span class="classification cls-automate">⚡ Fully Automate</span></td>
+            <td class="rationale">AI summary is reliable for dense docs; saves hours with no meaningful quality loss.</td>
+          </tr>
+          <tr>
+            <td class="task-num">12</td>
+            <td class="task-name">Preparing for technical interviews</td>
+            <td><span class="classification cls-collaborate">🤝 Collaborate</span></td>
+            <td class="rationale">AI generates practice problems and explains concepts, but understanding must be mine.</td>
+          </tr>
+          <tr>
+            <td class="task-num">13</td>
+            <td class="task-name">Creating data pipeline scripts (FlyrankAI tasks)</td>
+            <td><span class="classification cls-collaborate">🤝 Collaborate</span></td>
+            <td class="rationale">Complex enough to require my logic decisions; AI accelerates syntax and library use.</td>
+          </tr>
+          <tr>
+            <td class="task-num">14</td>
+            <td class="task-name">Writing cold emails / professional outreach</td>
+            <td><span class="classification cls-delegate">🔍 Delegate + Review</span></td>
+            <td class="rationale">AI drafts; I personalize tone and verify the ask is appropriate for the recipient.</td>
+          </tr>
+          <tr>
+            <td class="task-num">15</td>
+            <td class="task-name">Daily journaling / personal reflection</td>
+            <td><span class="classification cls-just-me">👤 Just Me</span></td>
+            <td class="rationale">Deeply personal — AI involvement would defeat the entire purpose of the exercise.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- PART 2: CLAUDE PROJECT -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div>
+        <div class="section-title">Claude Project — Custom Instructions</div>
+        <div class="section-desc">Configured project: "AI Fluency — Kainat Bibi's Workspace"</div>
+      </div>
+    </div>
+
+    <div class="claude-section">
+      <div class="card">
+        <div class="card-title">📋 Custom Instructions Written</div>
+        <div class="instructions-block">
+          <p><strong>Who I am:</strong> I'm Kainat Bibi, a computer science student and intern at FlyrankAI, working on AI-powered tools, full-stack web apps, and data pipelines. I'm currently completing the Anthropic AI Fluency certification.</p>
+          <br/>
+          <p><strong>Tone preferences:</strong> Be concise and technical, but approachable. Give direct answers — skip unnecessary caveats and filler. Use code examples when relevant. Flag when I'm approaching something the wrong way.</p>
+          <br/>
+          <p><strong>Current goals:</strong> Complete AI Fluency: Framework & Foundations (Anthropic Academy). Build production-quality full-stack projects for my portfolio. Improve prompt engineering and AI workflow design skills. Ship a capstone widget platform at FlyrankAI.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📸 Project Screenshot</div>
+        <img src="claude-project-screenshot.png" alt="Claude Project configured with custom instructions for AI Fluency — Kainat Bibi's Workspace" class="screenshot-img" />
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 3: TARGET TASKS -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div>
+        <div class="section-title">Three Target Tasks for FL-02 through FL-04</div>
+        <div class="section-desc">Specific tasks with measurable success definitions</div>
+      </div>
+    </div>
+
+    <div class="target-tasks">
+      <!-- Task 1 -->
+      <div class="target-card">
+        <div class="target-num">🎯 Target Task 1</div>
+        <div class="target-title">API Debugging & Error Resolution</div>
+        <div class="target-cls">
+          <span class="classification cls-collaborate">🤝 Collaborate with AI</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Debug backend API errors in Express.js / Node.js services built during my FlyrankAI internship.</p>
+
+        <div class="target-section-label">✅ "Done Well" Definition</div>
+        <ul class="success-list">
+          <li>Root cause is correctly identified, not just patched</li>
+          <li>AI-suggested fix is understood before applying</li>
+          <li>Fix includes a comment explaining WHY the error occurred</li>
+          <li>Solution tested with at least one edge case</li>
+          <li>Resolved in under 30 minutes (vs. ~2 hours solo)</li>
+        </ul>
+
+        <div class="metric-box">
+          <strong>Metric:</strong> ≥80% of bugs resolved within one session, with documented understanding of each fix.
+        </div>
+      </div>
+
+      <!-- Task 2 -->
+      <div class="target-card">
+        <div class="target-num">🎯 Target Task 2</div>
+        <div class="target-title">Technical Research Summaries</div>
+        <div class="target-cls">
+          <span class="classification cls-collaborate">🤝 Collaborate with AI</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Research and synthesize new technical concepts (e.g., RAG pipelines, auth patterns) to inform FlyrankAI project decisions.</p>
+
+        <div class="target-section-label">✅ "Done Well" Definition</div>
+        <ul class="success-list">
+          <li>Produces a clear 1-page summary with pros/cons and use-case fit</li>
+          <li>At least one external source verified beyond AI output</li>
+          <li>Summary is actionable with a clear project recommendation</li>
+          <li>Can explain concept in my own words without referencing AI</li>
+          <li>Written in under 45 minutes</li>
+        </ul>
+
+        <div class="metric-box">
+          <strong>Metric:</strong> Summary reviewed and approved by supervisor within one revision cycle.
+        </div>
+      </div>
+
+      <!-- Task 3 -->
+      <div class="target-card">
+        <div class="target-num">🎯 Target Task 3</div>
+        <div class="target-title">PR Descriptions & Documentation</div>
+        <div class="target-cls">
+          <span class="classification cls-delegate">🔍 Delegate to AI with Review</span>
+        </div>
+        <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Draft pull request descriptions, README updates, and inline code documentation for internship submissions.</p>
+
+        <div class="target-section-label">✅ "Done Well" Definition</div>
+        <ul class="success-list">
+          <li>PR description accurately describes what changed and why</li>
+          <li>README clear enough for a new team member to onboard solo</li>
+          <li>Inline comments explain non-obvious logic (not just what the code does)</li>
+          <li>No factual errors — everything stated in docs must be true</li>
+          <li>Zero grammatical or spelling issues</li>
+        </ul>
+
+        <div class="metric-box">
+          <strong>Metric:</strong> PRs merged on first or second review cycle with no documentation-related change requests.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 4: TOOL ACCOUNTS -->
+  <section class="section fade-in">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div>
+        <div class="section-title">Tool Accounts & Academy Enrollment</div>
+        <div class="section-desc">Evidence of setup completion</div>
+      </div>
+    </div>
+
+    <div class="tools-grid">
+      <div class="tool-card">
+        <span class="tool-icon">🤖</span>
+        <div>
+          <div class="tool-name">Claude (Anthropic)</div>
+          <div class="tool-status">✓ Account active · Project configured</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">💬</span>
+        <div>
+          <div class="tool-name">ChatGPT (OpenAI)</div>
+          <div class="tool-status">✓ Account active</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">🎓</span>
+        <div>
+          <div class="tool-name">Anthropic Academy</div>
+          <div class="tool-status">✓ Enrolled in AI Fluency course</div>
+        </div>
+      </div>
+      <div class="tool-card">
+        <span class="tool-icon">📚</span>
+        <div>
+          <div class="tool-name">Module 1 Complete</div>
+          <div class="tool-status">✓ Framework & Foundations — Done</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p>FL-01 Deliverable · AI Fluency: Framework & Foundations · <span>Kainat Bibi</span> · FlyrankAI Intern · 2026</p>
+</footer>
+
+</body>
+</html>
